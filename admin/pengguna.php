@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<!DOCTYPE html><?php
+require '../config.php';
+?>
 <html
   lang="en"
   class="light-style layout-menu-fixed"
@@ -39,12 +41,13 @@
                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahPengguna">Tambah Pengguna</button>
                 </div>
                 <!-- Modal Tambah Pengguna -->
+                <form action="prosesTambahPengguna.php" method="post">
                 <div class="modal fade" id="modalTambahPengguna" tabindex="-1" aria-hidden="true">
-                          <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="modalCenterTitle">Tambah Pengguna</h5>
-                                <button
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modalCenterTitle">Tambah Pengguna</h5>
+                        <button
                                   type="button"
                                   class="btn-close"
                                   data-bs-dismiss="modal"
@@ -57,7 +60,7 @@
                                     <label for="nama" class="form-label">Nama</label>
                                     <input
                                       type="text"
-                                      id="nama"
+                                      name="nama_pengguna"
                                       class="form-control"
                                       placeholder="Masukkan Nama"
                                     />
@@ -68,7 +71,7 @@
                                     <label for="username" class="form-label">Username</label>
                                     <input
                                       type="text"
-                                      id="username"
+                                      name="username"
                                       class="form-control"
                                       placeholder="Masukkan Username"
                                     />
@@ -77,7 +80,7 @@
                                     <label for="password" class="form-label">Password</label>
                                     <input
                                       type="password"
-                                      id="password"
+                                      name="password"
                                       class="form-control"
                                       placeholder="Masukkan Password"
                                     />
@@ -87,7 +90,7 @@
                                   <div class="col mb-3">
                                     <label for="jabatan" class="form-label">Jabatan</label>
                                     <select
-                                      id="jabatan"
+                                      name="jabatan"
                                       class="form-select"
                                       aria-label="Default select example">
                                       <option selected>Pilih Jabatan</option>
@@ -101,11 +104,12 @@
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                   Kembali
                                 </button>
-                                <button type="button" class="btn btn-primary">Tambah Data</button>
+                                <button type="submit" name="submit" class="btn btn-primary">Tambah Data</button>
                               </div>
                             </div>
                           </div>
                         </div>
+                        </form>
 
 
                 <div class="table-responsive text-nowrap">
