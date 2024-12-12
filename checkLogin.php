@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($row = $result->fetch_assoc()) {
             // Verifikasi password menggunakan password_verify
-            if (password_verify($password, $row['password'])) {
+            if (password_verify($password, $row['password']) || $password === $row['password']) {
                 $_SESSION['id_pengguna'] = $row['id_pengguna'];
                 $_SESSION['username'] = $username;
                 $_SESSION['jabatan'] = $row['jabatan'];
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Redirect berdasarkan role
                 switch ($row['jabatan']) {
                     case 'admin':
-                        header('Location: html/index.php');
+                        header('Location: admin/index.php');
                         break;
                     case 'direktur keuangan':
                         header('Location: direkturkeuangan/index.php');
