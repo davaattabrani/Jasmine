@@ -1,6 +1,30 @@
 <!DOCTYPE html><?php
+include '../config.php';
 include '../checkRole.php';
-checkRole(['admin']);
+checkRole(['Penanggung Jawab Farmasi']);
+
+// Ambil ID pengguna dari sesi atau sumber lain
+$id_pengguna = $_SESSION['id_pengguna'] ?? null; // Pastikan Anda menyimpan ID pengguna saat login
+
+if ($id_pengguna) {
+    // Pastikan $conn terdefinisi
+    if (isset($conn)) {
+        // Query untuk mendapatkan nama pengguna berdasarkan ID
+        $stmt = $conn->prepare("SELECT nama_pengguna, jabatan FROM pengguna WHERE id_pengguna = ?");
+        $stmt->bind_param("i", $id_pengguna); // Mengikat parameter dengan tipe integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        // Pastikan nama_pengguna ada
+        $nama_pengguna = $user['nama_pengguna'] ?? 'Guest';
+        $jabatan = $user['jabatan'] ?? 'Guest';
+    } else {
+        $nama_pengguna = 'Guest'; // Jika koneksi gagal, gunakan nilai default
+    }
+} else {
+    $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
+}
 ?>
 <html
   lang="en"
@@ -40,7 +64,10 @@ checkRole(['admin']);
                     <div class="d-flex align-items-end row">
                         <div class="col-sm-7">
                             <div class="card-body">
-                            <h5 class="card-title text-primary">Selamat Datang Admin! 🎉</h5>
+                            <?php
+                            $username = $username ?? 'Guest';
+                            ?>
+                            <h5 class="card-title text-primary">Selamat Datang <?php echo htmlspecialchars($nama_pengguna); ?>! 🎉</h5>
                             <p class="mb-4">
                                 Selamat bekerja !
                             </p>

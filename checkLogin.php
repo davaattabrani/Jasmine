@@ -36,17 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     case 'admin':
                         header('Location: admin/index.php');
                         break;
-                    case 'direktur keuangan':
-                        header('Location: direkturkeuangan/index.php');
+                    case 'Penanggung Jawab Farmasi':
+                        header('Location: penanggungJawab/index.php');
                         break;
                     case 'direktur utama':
                         header('Location: direkturutama/index.php');
-                        break;
-                    case 'asisten apoteker':
-                        header('Location: asistenApoteker/index.php');
-                        break;
-                    case 'apoteker penanggung jawab':
-                        header('Location: apotekerpenanggungjawab/index.php');
                         break;
                     default:
                         header('Location: login.php'); // Redirect kembali jika role tidak dikenali

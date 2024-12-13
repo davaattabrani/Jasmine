@@ -27,8 +27,8 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">Admin</span>
-                            <small class="text-muted">Admin</small>
+                            <span class="fw-semibold d-block"><?php echo htmlspecialchars($nama_pengguna ?? 'Guest'); ?></span>
+                            <small class="text-muted"><?php echo htmlspecialchars($jabatan ?? 'Guest'); ?></small>
                           </div>
                         </div>
                       </a>
