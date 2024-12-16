@@ -23,6 +23,46 @@
               </a>
             </li>
 
+            <!-- Obat -->
+            <li class="menu-item">
+              <a href="obat.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-capsule"></i>
+                <div data-i18n="Analytics">Obat</div>
+              </a>
+            </li>
+            
+            <!-- Obat Keluar-->
+            <li class="menu-item">
+              <a href="obat.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-capsule"></i>
+                <div data-i18n="Analytics">Obat Keluar</div>
+              </a>
+            </li>
+
+            <!-- Jenis -->
+            <li class="menu-item">
+              <a href="obat.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-category"></i>
+                <div data-i18n="Analytics">Jenis</div>
+              </a>
+            </li>
+
+            <!-- Satuan -->
+            <li class="menu-item">
+              <a href="obat.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-tag"></i>
+                <div data-i18n="Analytics">Satuan</div>
+              </a>
+            </li>
+
+            <!-- Supplier -->
+            <li class="menu-item">
+              <a href="supplier.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-truck"></i>
+                <div data-i18n="Analytics">Supplier</div>
+              </a>
+            </li>
+
             <!-- Periode -->
             <li class="menu-item">
               <a href="periode.php" class="menu-link">
