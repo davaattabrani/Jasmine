@@ -30,14 +30,6 @@
                 <div data-i18n="Analytics">Obat</div>
               </a>
             </li>
-            
-            <!-- Obat Keluar-->
-            <li class="menu-item">
-              <a href="obat.php" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-capsule"></i>
-                <div data-i18n="Analytics">Obat Keluar</div>
-              </a>
-            </li>
 
             <!-- Jenis -->
             <li class="menu-item">
