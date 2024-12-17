@@ -62,5 +62,13 @@
                 <div data-i18n="Tables">Periode</div>
               </a>
             </li>
+
+            <!-- Obat Keluar -->
+            <li class="menu-item">
+              <a href="obatKeluar.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-archive-out"></i>
+                <div data-i18n="Tables">Obat Keluar</div>
+              </a>
+            </li>
           </ul>
         </aside>
