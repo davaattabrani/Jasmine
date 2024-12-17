@@ -33,7 +33,7 @@
 
             <!-- Jenis -->
             <li class="menu-item">
-              <a href="obat.php" class="menu-link">
+              <a href="jenis.php" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-category"></i>
                 <div data-i18n="Analytics">Jenis</div>
               </a>
@@ -41,7 +41,7 @@
 
             <!-- Satuan -->
             <li class="menu-item">
-              <a href="obat.php" class="menu-link">
+              <a href="satuan.php" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-tag"></i>
                 <div data-i18n="Analytics">Satuan</div>
               </a>
