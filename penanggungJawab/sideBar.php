@@ -23,11 +23,35 @@
               </a>
             </li>
 
-            <!-- Pengguna -->
+            <!-- Stok -->
             <li class="menu-item">
-              <a href="pengguna.php" class="menu-link">
-                <i class="menu-icon tf-icons bx bxs-user"></i>
-                <div data-i18n="Tables">Pengguna</div>
+              <a href="stok.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-capsule"></i>
+                <div data-i18n="Tables">Stok</div>
+              </a>
+            </li>
+
+            <!-- Pengadaan -->
+            <li class="menu-item">
+              <a href="pengadaan.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-add-to-queue"></i>
+                <div data-i18n="Tables">Pengadaan</div>
+              </a>
+            </li>
+
+            <!-- Obat Masuk -->
+            <li class="menu-item">
+              <a href="obatMasuk.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-archive-in"></i>
+                <div data-i18n="Tables">Obat Masuk</div>
+              </a>
+            </li>
+
+            <!-- Obat Keluar -->
+            <li class="menu-item">
+              <a href="obatKeluar.php" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-archive-out"></i>
+                <div data-i18n="Tables">Obat Keluar</div>
               </a>
             </li>
           </ul>

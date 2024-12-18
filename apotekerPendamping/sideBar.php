@@ -66,7 +66,7 @@
             <!-- Obat Masuk -->
             <li class="menu-item">
               <a href="obatMasuk.php" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-archive-in"></i>
+                <i class="menu-icon tf-icons bx bxs-archive-in"></i>
                 <div data-i18n="Tables">Obat Masuk</div>
               </a>
             </li>
