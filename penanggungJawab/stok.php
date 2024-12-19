@@ -290,7 +290,6 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <th>Jenis</th>
                         <th>Satuan</th>
                         <th>Stok Akhir</th>
-                        <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -304,24 +303,6 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
                             <td>25</td>
-                            <td>
-                                <div class="dropdown">
-                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                        <i class="bx bx-dots-vertical-rounded"></i>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObat"
-                                          data-id="<?php echo htmlspecialchars($row['id_obat']); ?>" 
-                                          data-nama="<?php echo htmlspecialchars($row['nama_obat']); ?>" 
-                                          data-jenis="<?php echo htmlspecialchars($row['id_jenis']); ?>"
-                                          data-satuan="<?php echo htmlspecialchars($row['id_satuan']); ?>" 
-                                          data-supplier="<?php echo htmlspecialchars($row['id_supplier']); ?>">
-                                          <i class="bx bx-edit-alt me-1"></i> Edit
-                                        </a>
-                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat']; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
-                                    </div>
-                                </div>
-                            </td>
                         </tr>
                         <?php } ?>
                     </tbody>
