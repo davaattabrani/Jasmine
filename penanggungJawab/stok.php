@@ -126,6 +126,8 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <th>Nama Obat</th>
                         <th>Jenis</th>
                         <th>Satuan</th>
+                        <th>Obat Keluar</th>
+                        <th>Kadaluarsa</th>
                         <th>Stok Akhir</th>
                       </tr>
                     </thead>
@@ -139,6 +141,8 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_obat']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
+                            <td>11</td>
+                            <td>0</td>
                             <td>25</td>
                         </tr>
                         <?php } ?>

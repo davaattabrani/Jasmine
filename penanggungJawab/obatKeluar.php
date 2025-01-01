@@ -291,6 +291,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <th>Satuan</th>
                         <th>Supplier</th>
                         <th>Jumlah Keluar</th>
+                        <th>Kadaluarsa</th>
                         <th>Periode</th>
                         <th>Aksi</th>
                       </tr>
@@ -307,6 +308,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_supplier']);?></td>
                             <td>80</td>
+                            <td>0</td>
                             <td>Januari, 2024</td>
                             <td>
                                 <div class="dropdown">

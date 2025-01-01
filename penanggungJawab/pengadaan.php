@@ -117,17 +117,17 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                 <div class="card-body">
                     <form method="post" action="generate.php">
                         <div class="form-group row">
-                            <label for="tahun" class="col-sm-2 col-form-label">Tahun:</label>
+                            <label for="tahun" class="col-sm-2 col-form-label">Ambil Data Dari Tahun:</label>
                             <div class="col-sm-2">
                                 <select class="form-control" id="tahun" name="tahun">
                                     <?php
-                                    for ($i = date('Y'); $i >= 2010; $i--) {
+                                    for ($i = date('Y'); $i >= 2022; $i--) {
                                         echo "<option value='$i'>$i</option>";
                                     }
                                     ?>
                                 </select>
                             </div>
-                            <label for="bulan" class="col-sm-2 col-form-label">Bulan:</label>
+                            <label for="bulan" class="col-sm-2 col-form-label">Ambil Data Dari Bulan:</label>
                             <div class="col-sm-2">
                                 <select class="form-control" id="bulan" name="bulan">
                                     <?php
@@ -138,18 +138,19 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                                     ?>
                                 </select>
                             </div>
-                            <label for="bulan" class="col-sm-2 col-form-label">Hari:</label>
+                            <label for="bulan" class="col-sm-2 col-form-label">Peramalan Untuk Bulan :</label>
                             <div class="col-sm-2">
-                                <select class="form-control" id="bulan" name="bulan">
+                            <select class="form-control" id="bulan" name="bulan">
                                     <?php
-                                    for ($i = 1; $i <= 31; $i++) {
-                                        echo "<option value='$i'>$i</option>";
+                                    for ($i = 1; $i <= 12; $i++) {
+                                        $bulan = date('F', mktime(0, 0, 0, $i, 10));
+                                        echo "<option value='$i'>$bulan</option>";
                                     }
                                     ?>
                                 </select>
                             </div>
                             <div class="col-sm-2">
-                                <button type="submit" class="btn btn-primary">Hitung</button>
+                                <button type="submit" class="btn btn-success">Hitung</button>
                             </div>
                         </div>
                     </form>
@@ -167,8 +168,10 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <th>Jenis</th>
                         <th>Satuan</th>
                         <th>Sisa Stok</th>
-                        <th>Keterangan</th>
-                        <th>Aksi</th>
+                        <th>Hasil Peramalan</th>
+                        <th>Safety Stock</th>
+                        <th>Total Pengadaan</th>
+                        <th>Supplier</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -181,12 +184,16 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_obat']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
-                            <td>25</td>
-                            <td>Stok Aman</td>
+                            <td>5</td>
+                            <td>34</td>
+                            <td>5</td>
+                            <td>44</td>
                             <td>
-                                <div class="dropdown">
-                                    <a href="hitungPeramalan.php"><i class="bx bx-edit-alt me-1"></i> Hitung Peramalan</a>
-                                </div>
+                            <select class="form-control" id="bulan" name="bulan">
+                                <option value="PT Jaya Farmasi">PT Jaya Farmasi</option>
+                                <option value="PT Ramdan Cahaya">PT Ramdan Cahaya</option>
+                                <option value="CV Kimia Farma">CV Kimia Farma</option>
+                            </select>
                             </td>
                         </tr>
                         <?php } ?>
@@ -195,10 +202,8 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                 </div>
                 <!-- Tambahkan tombol di bawah tabel -->
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
                         <button class="btn btn-primary me-2" onclick="window.print()">Cetak</button>
-                        <a href="tambahObat.php" class="btn btn-success">Tambah Obat Masuk</a>
-                    </div>
+                        <a href="tambahObat.php" class="btn btn-primary">Tambah Obat Masuk</a>
                 </div>
               </div>
             </div>

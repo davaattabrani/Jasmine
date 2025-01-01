@@ -113,11 +113,12 @@ $ressupplier = mysqli_query($conn, $datasupplier);
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Obat Keluar</h5>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahObatKeluar">Tambah Obat Keluar</button>
                 </div>
 
                 <!-- Modal Tambah Obat -->
                 <form action="prosesTambahObat.php" method="post">
-                <div class="modal fade" id="modalTambahObat" tabindex="-1" aria-hidden="true">
+                <div class="modal fade" id="modalTambahObatKeluar" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -281,7 +282,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         </form>
 
                  <!-- Tabel -->                           
-                <div class="table-responsive text-nowrap">
+                 <div class="table-responsive text-nowrap">
                   <table class="table table-striped">
                     <thead>
                       <tr>
@@ -291,6 +292,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <th>Satuan</th>
                         <th>Supplier</th>
                         <th>Jumlah Keluar</th>
+                        <th>Kadaluarsa</th>
                         <th>Periode</th>
                         <th>Aksi</th>
                       </tr>
@@ -307,6 +309,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_supplier']);?></td>
                             <td>80</td>
+                            <td>0</td>
                             <td>Januari, 2024</td>
                             <td>
                                 <div class="dropdown">
