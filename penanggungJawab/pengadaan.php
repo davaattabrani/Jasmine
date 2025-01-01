@@ -114,171 +114,48 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Stok</h5>
                 </div>
-
-                <!-- Modal Tambah Obat -->
-                <form action="prosesTambahObat.php" method="post">
-                <div class="modal fade" id="modalTambahObat" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modalCenterTitle">Tambah Obat</h5>
-                        <button
-                                  type="button"
-                                  class="btn-close"
-                                  data-bs-dismiss="modal"
-                                  aria-label="Close"
-                                ></button>
-                              </div>
-                              <div class="modal-body">
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="nama" class="form-label">Nama Obat</label>
-                                    <input
-                                      type="text"
-                                      name="nama_obat"
-                                      class="form-control"
-                                      placeholder="Masukkan Nama Obat"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="row g-2">
-                                  <div class="col mb-0">
-                                  <label for="jenis" class="form-label">Jenis</label>
-                                    <select
-                                      name="nama_jenis"
-                                      class="form-select"
-                                      aria-label="Default select example">
-                                      <option selected>Pilih Jenis</option>
-                                      <?php
-                                        while ($rowJenis = mysqli_fetch_assoc($resJenis)) {
-                                            echo "<option value='" . $rowJenis['id_jenis'] . "'>" . $rowJenis['nama_jenis'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                  </div>
-                                  <div class="col mb-2">
-                                  <label for="satuan" class="form-label">Satuan</label>
-                                    <select
-                                      name="nama_satuan"
-                                      class="form-select"
-                                      aria-label="Default select example">
-                                      <option selected>Pilih Satuan</option>
-                                      <?php
-                                        while ($rowSatuan = mysqli_fetch_assoc($resSatuan)) {
-                                            echo "<option value='" . $rowSatuan['id_satuan'] . "'>" . $rowSatuan['nama_satuan'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="supplier" class="form-label">Nama Supplier</label>
-                                    <select
-                                      name="nama_supplier"
-                                      class="form-select"
-                                      aria-label="Default select example">
-                                      <option selected>Pilih Supplier</option>
-                                      <?php
-                                        while ($rowSupplier = mysqli_fetch_assoc($resSupplier)) {
-                                            echo "<option value='" . $rowSupplier['id_supplier'] . "'>" . $rowSupplier['nama_supplier'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                  Kembali
-                                </button>
-                                <button type="submit" name="submit" class="btn btn-primary">Tambah Data</button>
-                              </div>
+                <div class="card-body">
+                    <form method="post" action="generate.php">
+                        <div class="form-group row">
+                            <label for="tahun" class="col-sm-2 col-form-label">Tahun:</label>
+                            <div class="col-sm-2">
+                                <select class="form-control" id="tahun" name="tahun">
+                                    <?php
+                                    for ($i = date('Y'); $i >= 2010; $i--) {
+                                        echo "<option value='$i'>$i</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
-                          </div>
-                        </div>
-                        </form>
-
-                        <form action="prosesUbahObat.php" method="post">
-                        <div class="modal fade" id="modalUbahObat" tabindex="-1" aria-hidden="true">
-                          <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="modalCenterTitle">Ubah Obat</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                              </div>
-                              <div class="modal-body">
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="id" class="form-label">ID</label>
-                                    <input type="text" name="id_obat" class="form-control" placeholder="Masukkan Nama Obat" value="<?php echo isset($row['id_obat']) ? htmlspecialchars($row['id_obat']) : ''; ?>" readonly />
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col mb-3">
-                                  <label for="nama" class="form-label">Nama Obat</label>
-                                    <input
-                                      type="text"
-                                      name="nama_obat"
-                                      class="form-control"
-                                      placeholder="Masukkan Nama Obat"
-                                      value="<?php echo isset($row['nama_obat']) ? htmlspecialchars($row['nama_obat']) : ''; ?>"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="row g-2">
-                                  <div class="col mb-0">
-                                  <label for="jenis" class="form-label">Jenis</label>
-                                  <select name="id_jenis" class="form-select">
-                                      <option value="">Pilih Jenis</option>
-                                      <?php
-                                      // Menampilkan opsi untuk jenis
-                                      while ($rowJenis = mysqli_fetch_assoc($resJenis)) {
-                                          $selected = (isset($row['id_jenis']) && $row['id_jenis'] == $rowJenis['id_jenis']) ? 'selected' : '';
-                                          echo "<option value='" . $rowJenis['id_jenis'] . "' $selected>" . $rowJenis['nama_jenis'] . "</option>";
-                                      }
-                                      ?>
-                                  </select>
-
-                                  </div>
-                                  <div class="col mb-2">
-                                  <label for="satuan" class="form-label">Satuan</label>
-                                    <select name="id_satuan" id="id_satuan" class="form-select" aria-label="Default select example">
-                                      <option value="">Pilih Satuan</option>
-                                      <?php
-                                        while ($rowSatuan = mysqli_fetch_assoc($resSatuan)) {
-                                            $selected = isset($row['id_satuan']) && $rowSatuan['id_satuan'] == $row['id_satuan'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSatuan['id_satuan'] . "'>" . $rowSatuan['nama_satuan'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="supplier" class="form-label">Nama Supplier</label>
-                                    <select name="id_supplier" id="id_supplier" class="form-select" aria-label="Default select example">
-                                      <option value="">Pilih Supplier</option>
-                                      <?php
-                                        while ($rowSupplier = mysqli_fetch_assoc($resSupplier)) {
-                                            $selected = isset($row['id_supplier']) && $rowSupplier['id_supplier'] == $row['id_supplier'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSupplier['id_supplier'] . "'>" . $rowSupplier['nama_supplier'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                  Kembali
-                                </button>
-                                <button type="submit" name="submit" class="btn btn-primary">Ubah Data</button>
-                              </div>
+                            <label for="bulan" class="col-sm-2 col-form-label">Bulan:</label>
+                            <div class="col-sm-2">
+                                <select class="form-control" id="bulan" name="bulan">
+                                    <?php
+                                    for ($i = 1; $i <= 12; $i++) {
+                                        $bulan = date('F', mktime(0, 0, 0, $i, 10));
+                                        echo "<option value='$i'>$bulan</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
-                          </div>
+                            <label for="bulan" class="col-sm-2 col-form-label">Hari:</label>
+                            <div class="col-sm-2">
+                                <select class="form-control" id="bulan" name="bulan">
+                                    <?php
+                                    for ($i = 1; $i <= 31; $i++) {
+                                        echo "<option value='$i'>$i</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-primary">Hitung</button>
+                            </div>
                         </div>
-                        </form>
+                    </form>
+                </div>
+
+                
 
                  <!-- Tabel -->                           
                 <div class="table-responsive text-nowrap">
@@ -315,6 +192,13 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                         <?php } ?>
                     </tbody>
                   </table>
+                </div>
+                <!-- Tambahkan tombol di bawah tabel -->
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary me-2" onclick="window.print()">Cetak</button>
+                        <a href="tambahObat.php" class="btn btn-success">Tambah Obat Masuk</a>
+                    </div>
                 </div>
               </div>
             </div>
