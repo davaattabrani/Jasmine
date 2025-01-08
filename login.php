@@ -49,6 +49,15 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="assets/js/config.js"></script>
+
+    <style>
+      body {
+        background-image: url('assets/img/backgrounds/bg.png'); /* Ganti dengan path gambar background Anda */
+        background-size: 50%; /* Mengatur ukuran gambar agar menutupi seluruh halaman */
+        background-position: center; /* Mengatur posisi gambar di tengah */
+        background-opacity: 0.5; /* Mengatur tingkat transparansi untuk gambar background */
+      }
+    </style>
   </head>
 
   <body>
@@ -63,7 +72,10 @@
               <!-- Logo -->
               <div class="app-brand justify-content-center">
                 <a href="index.html" class="app-brand-link gap-2">
-                  <h4 class="demo text-body fw-bolder">Klinik Jasmine MQ</h4>
+                  <div class="d-flex flex-column align-items-center">
+                    <img src="assets\img\icons\brands\logo.png" alt="Logo Klinik Jasmine MQ" class="logo-image" style="width: 100px; height: auto;" />
+                    <h4 class="demo text-body fw-bolder">Klinik Jasmine MQ</h4>
+                  </div>
                 </a>
               </div>
               <form id="formAuthentication" class="mb-3" action="checkLogin.php" method="POST">

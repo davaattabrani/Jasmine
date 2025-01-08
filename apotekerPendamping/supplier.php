@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <?php
 require '../config.php';
-
+include '../checkRole.php';
+checkRole(['Apoteker Pendamping']);
 // Gantikan pemanggilan query() dengan mysqli_query()
 $conn = mysqli_connect("localhost", "root", "", "db_jasmine");
 if (!$conn) {
@@ -24,6 +25,28 @@ if (isset($_GET['id_supplier'])) {
     $id_supplier = $_GET['id_supplier'];
     $query = mysqli_query($conn, "SELECT * FROM supplier WHERE id_supplier = '$id_supplier'");
     $row = mysqli_fetch_assoc($query);
+}
+
+$id_pengguna = $_SESSION['id_pengguna'] ?? null; // Pastikan Anda menyimpan ID pengguna saat login
+
+if ($id_pengguna) {
+    // Pastikan $conn terdefinisi
+    if (isset($conn)) {
+        // Query untuk mendapatkan nama pengguna berdasarkan ID
+        $stmt = $conn->prepare("SELECT nama_pengguna, jabatan FROM pengguna WHERE id_pengguna = ?");
+        $stmt->bind_param("i", $id_pengguna); // Mengikat parameter dengan tipe integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        // Pastikan nama_pengguna ada
+        $nama_pengguna = $user['nama_pengguna'] ?? 'Guest';
+        $jabatan = $user['jabatan'] ?? 'Guest';
+    } else {
+        $nama_pengguna = 'Guest'; // Jika koneksi gagal, gunakan nilai default
+    }
+} else {
+    $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
 }
 ?>
 <html
@@ -57,7 +80,7 @@ if (isset($_GET['id_supplier'])) {
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Dashboard /</span> Supplier
+                <span class="text-muted fw-light">Beranda /</span> Supplier
               </h4>
 
               <div class="card">

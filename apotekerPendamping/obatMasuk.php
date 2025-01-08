@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <?php
 require '../config.php';
-
+include '../checkRole.php';
+checkRole(['Apoteker Pendamping']);
 
 // Gantikan pemanggilan query() dengan mysqli_query()
 $conn = mysqli_connect("localhost", "root", "", "db_jasmine");
@@ -75,6 +76,27 @@ $ressatuan = mysqli_query($conn, $datasatuan);
 $datasupplier = "SELECT * FROM supplier";
 $ressupplier = mysqli_query($conn, $datasupplier);
 
+$id_pengguna = $_SESSION['id_pengguna'] ?? null; // Pastikan Anda menyimpan ID pengguna saat login
+
+if ($id_pengguna) {
+    // Pastikan $conn terdefinisi
+    if (isset($conn)) {
+        // Query untuk mendapatkan nama pengguna berdasarkan ID
+        $stmt = $conn->prepare("SELECT nama_pengguna, jabatan FROM pengguna WHERE id_pengguna = ?");
+        $stmt->bind_param("i", $id_pengguna); // Mengikat parameter dengan tipe integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        // Pastikan nama_pengguna ada
+        $nama_pengguna = $user['nama_pengguna'] ?? 'Guest';
+        $jabatan = $user['jabatan'] ?? 'Guest';
+    } else {
+        $nama_pengguna = 'Guest'; // Jika koneksi gagal, gunakan nilai default
+    }
+} else {
+    $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
+}
 ?>
 <html
   lang="en"
@@ -107,7 +129,7 @@ $ressupplier = mysqli_query($conn, $datasupplier);
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Dashboard /</span> Obat Masuk
+                <span class="text-muted fw-light">Beranda /</span> Obat Masuk
               </h4>
 
               <div class="card">

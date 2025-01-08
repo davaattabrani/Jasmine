@@ -130,7 +130,7 @@ if ($id_pengguna) {
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Dashboard /</span> Obat
+                <span class="text-muted fw-light">Beranda /</span> Obat
               </h4>
 
               <div class="card">
@@ -256,10 +256,9 @@ if ($id_pengguna) {
                                   <select name="id_jenis" class="form-select">
                                       <option value="">Pilih Jenis</option>
                                       <?php
-                                      // Menampilkan opsi untuk jenis
-                                      while ($rowJenis = mysqli_fetch_assoc($resJenis)) {
-                                          $selected = (isset($row['id_jenis']) && $row['id_jenis'] == $rowJenis['id_jenis']) ? 'selected' : '';
-                                          echo "<option value='" . $rowJenis['id_jenis'] . "' $selected>" . $rowJenis['nama_jenis'] . "</option>";
+                                      while ($arrayjenis = mysqli_fetch_array($resjenis)) {
+                                        $selected = isset($row['id_jenis']) && $arrayjenis['id_jenis'] == $row['id_jenis'] ? 'selected' : '';
+                                        echo "<option $selected value='" . $arrayjenis['id_jenis'] . "'>" . $arrayjenis['nama_jenis'] . "</option>";
                                       }
                                       ?>
                                   </select>
@@ -270,11 +269,11 @@ if ($id_pengguna) {
                                     <select name="id_satuan" id="id_satuan" class="form-select" aria-label="Default select example">
                                       <option value="">Pilih Satuan</option>
                                       <?php
-                                        while ($rowSatuan = mysqli_fetch_assoc($resSatuan)) {
-                                            $selected = isset($row['id_satuan']) && $rowSatuan['id_satuan'] == $row['id_satuan'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSatuan['id_satuan'] . "'>" . $rowSatuan['nama_satuan'] . "</option>";
-                                        }
-                                        ?>
+                                      while ($arraysatuan = mysqli_fetch_array($ressatuan)) {
+                                        $selected = isset($row['id_satuan']) && $arraysatuan['id_satuan'] == $row['id_satuan'] ? 'selected' : '';
+                                        echo "<option $selected value='" . $arraysatuan['id_satuan'] . "'>" . $arraysatuan['nama_satuan'] . "</option>";
+                                      }
+                                      ?>
                                     </select>
                                   </div>
                                 </div>
@@ -284,11 +283,11 @@ if ($id_pengguna) {
                                     <select name="id_supplier" id="id_supplier" class="form-select" aria-label="Default select example">
                                       <option value="">Pilih Supplier</option>
                                       <?php
-                                        while ($rowSupplier = mysqli_fetch_assoc($resSupplier)) {
-                                            $selected = isset($row['id_supplier']) && $rowSupplier['id_supplier'] == $row['id_supplier'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSupplier['id_supplier'] . "'>" . $rowSupplier['nama_supplier'] . "</option>";
-                                        }
-                                        ?>
+                                      while ($arraysupplier = mysqli_fetch_array($ressupplier)) {
+                                        $selected = isset($row['id_supplier']) && $arraysupplier['id_supplier'] == $row['id_supplier'] ? 'selected' : '';
+                                        echo "<option $selected value='" . $arraysupplier['id_supplier'] . "'>" . $arraysupplier['nama_supplier'] . "</option>";
+                                      }
+                                      ?>
                                     </select>
                                   </div>
                                 </div>
@@ -435,7 +434,7 @@ if ($id_pengguna) {
     <script>
         function konfirmasiHapus(id) {
             if (confirm('Yakin Ingin Menghapus Data?')) {
-                window.location.href = 'prosesHapusSupplier.php?id_supplier=' + id;
+                window.location.href = 'prosesHapusObat.php?id_obat=' + id;
             }
         }
     </script>
