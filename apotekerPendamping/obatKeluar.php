@@ -65,7 +65,7 @@ if ($obat_keluar_result) {
  } 
  
  // Query untuk tabel obat
- $queryObatKeluar = "SELECT id_obat_keluar, jumlah_keluar FROM obat_keluar ORDER BY jumlah_keluar";
+ $queryObatKeluar = "SELECT * FROM obat_keluar ORDER BY jumlah_keluar";
  $resObatKeluar = mysqli_query($conn, $queryObatKeluar);
  if (!$resObatKeluar) {
      die("Query failed: " . mysqli_error($conn));
