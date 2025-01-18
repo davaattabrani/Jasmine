@@ -4,78 +4,7 @@ require '../config.php';
 include '../checkRole.php';
 checkRole(['Apoteker Pendamping']);
 
-// Gantikan pemanggilan query() dengan mysqli_query()
-$conn = mysqli_connect("localhost", "root", "", "db_jasmine");
-if (!$conn) {
-    die("Koneksi ke basis data gagal: " . mysqli_connect_error());
-}
-
-$obat_result = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                        FROM obat o
-                                        JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                        JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                        JOIN supplier sup ON o.id_supplier = sup.id_supplier");
-
-// Periksa apakah kueri berhasil sebelum melanjutkan
-if (!$obat_result) {
-    die("Query error: " . mysqli_error($conn));
-}
-
-if ($obat_result) {
-    $obat = mysqli_fetch_all($obat_result, MYSQLI_ASSOC);
-}
-
-// Tambahkan logika untuk mendapatkan data pengguna berdasarkan ID
-$row = []; // Inisialisasi $row sebagai array kosong
-if (isset($_GET['id_obat'])) {
-    $id_obat = $_GET['id_obat'];
-    $query = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                    FROM obat o
-                                    JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                    JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                    JOIN supplier sup ON o.id_supplier = sup.id_supplier
-                                    WHERE o.id_obat = '$id_obat'");
-    
-    // Periksa apakah query berhasil dan ada hasil
-    if ($query) {
-        $row = mysqli_fetch_assoc($query);
-        // Cek apakah data ditemukan
-        if (!$row) {
-            die("Data tidak ditemukan untuk ID obat: " . htmlspecialchars($id_obat));
-        }
-    } else {
-        die("Query error: " . mysqli_error($conn));
-    }
-}
-
- // Query untuk tabel jenis
- $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
- $resJenis = mysqli_query($conn, $queryJenis);
- if (!$resJenis) {
-     die("Query failed: " . mysqli_error($conn));
- }
-
- // Query untuk tabel satuan
- $querySatuan = "SELECT id_satuan, nama_satuan FROM satuan ORDER BY nama_satuan";
- $resSatuan = mysqli_query($conn, $querySatuan);
- if (!$resSatuan) {
-     die("Query failed: " . mysqli_error($conn));
- }
-
- // Query untuk tabel supplier
- $querySupplier = "SELECT id_supplier, nama_supplier FROM supplier ORDER BY nama_supplier";
- $resSupplier = mysqli_query($conn, $querySupplier);
- if (!$resSupplier) {
-     die("Query failed: " . mysqli_error($conn));
- }
-
-$datajenis = "SELECT * FROM jenis";
-$resjenis = mysqli_query($conn, $datajenis);
-$datasatuan = "SELECT * FROM satuan";
-$ressatuan = mysqli_query($conn, $datasatuan);
-$datasupplier = "SELECT * FROM supplier";
-$ressupplier = mysqli_query($conn, $datasupplier);
-
+// Ambil ID pengguna dari sesi atau sumber lain
 $id_pengguna = $_SESSION['id_pengguna'] ?? null; // Pastikan Anda menyimpan ID pengguna saat login
 
 if ($id_pengguna) {
@@ -97,6 +26,118 @@ if ($id_pengguna) {
 } else {
     $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
 }
+
+$conn = mysqli_connect("localhost", "root", "", "db_jasmine");
+if (!$conn) {
+    die("Koneksi ke basis data gagal: " . mysqli_connect_error());
+}
+
+$obat_masuk_result = mysqli_query($conn, "SELECT 
+    o.nama_obat,
+    j.nama_jenis AS jenis,
+    s.nama_satuan AS satuan,
+    sup.nama_supplier AS supplier,
+    om.jumlah_masuk,
+    CONCAT(pb.bulan, ' ', pt.tahun) AS periode
+FROM obat_masuk om
+JOIN obat o ON om.id_obat = o.id_obat
+JOIN jenis j ON o.id_jenis = j.id_jenis
+JOIN satuan s ON o.id_satuan = s.id_satuan
+JOIN supplier sup ON o.id_supplier = sup.id_supplier
+JOIN periode_bulan pb ON om.id_periode_bulan = pb.id_periode_bulan
+JOIN periode_tahun pt ON om.id_periode_tahun = pt.id_periode_tahun
+ORDER BY pt.tahun, pb.bulan");
+
+// Periksa apakah kueri berhasil sebelum melanjutkan
+if (!$obat_masuk_result) {
+    die("Query error: " . mysqli_error($conn));
+}
+
+if ($obat_masuk_result) {
+    $obat_masuk = mysqli_fetch_all($obat_masuk_result, MYSQLI_ASSOC);
+}
+
+ // Query untuk tabel obat
+ $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $resObat = mysqli_query($conn, $queryObat);
+ if (!$resObat) {
+     die("Query failed: " . mysqli_error($conn));
+ } 
+ 
+ // Query untuk tabel obat
+ $queryObatMasuk = "SELECT * FROM obat_masuk ORDER BY jumlah_masuk";
+ $resObatMasuk = mysqli_query($conn, $queryObatMasuk);
+ if (!$resObatMasuk) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+ 
+ // Query untuk tabel obat
+ $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $resObat = mysqli_query($conn, $queryObat);
+ if (!$resObat) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+
+// Query untuk tabel jenis
+ $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
+ $resJenis = mysqli_query($conn, $queryJenis);
+ if (!$resJenis) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+
+ // Query untuk tabel satuan
+ $querySatuan = "SELECT id_satuan, nama_satuan FROM satuan ORDER BY nama_satuan";
+ $resSatuan = mysqli_query($conn, $querySatuan);
+ if (!$resSatuan) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+
+ // Query untuk tabel supplier
+ $querySupplier = "SELECT id_supplier, nama_supplier FROM supplier ORDER BY nama_supplier";
+ $resSupplier = mysqli_query($conn, $querySupplier);
+ if (!$resSupplier) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+
+ $row = []; // Inisialisasi $row sebagai array kosong
+if (isset($_GET['id_obat_masuk'])) {
+    $id_obat_masuk = $_GET['id_obat_masuk'];
+    $query = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
+                                    FROM obat o
+                                    JOIN jenis jen ON o.id_jenis = jen.id_jenis
+                                    JOIN satuan sat ON o.id_satuan = sat.id_satuan
+                                    JOIN supplier sup ON o.id_supplier = sup.id_supplier
+                                    WHERE o.id_obat = '$id_obat'");
+    
+    // Periksa apakah query berhasil dan ada hasil
+    if ($query) {
+        $row = mysqli_fetch_assoc($query);
+        // Cek apakah data ditemukan
+        if (!$row) {
+            die("Data tidak ditemukan untuk ID obat: " . htmlspecialchars($id_obat));
+        }
+    } else {
+        die("Query error: " . mysqli_error($conn));
+    }
+}
+ 
+$dataperiodebulan = "SELECT * FROM periode_bulan";
+$resperiodebulan = mysqli_query($conn, $dataperiodebulan);
+
+$dataperiodetahun = "SELECT * FROM periode_tahun";
+$resperiodetahun = mysqli_query($conn, $dataperiodetahun);
+
+$datajenis = "SELECT * FROM jenis";
+$resjenis = mysqli_query($conn, $datajenis);
+
+$datasatuan = "SELECT * FROM satuan";
+$ressatuan = mysqli_query($conn, $datasatuan);
+
+$datasupplier = "SELECT * FROM supplier";
+$ressupplier = mysqli_query($conn, $datasupplier);
+
+$dataobatmasuk = "SELECT * FROM obat_masuk";
+$resObatMasuk = mysqli_query($conn, $dataobatmasuk);
 ?>
 <html
   lang="en"
@@ -319,17 +360,17 @@ if ($id_pengguna) {
                     </thead>
                     <tbody class="table-border-bottom-0">
                       <?php $i = 1; ?>
-                      <?php foreach ($obat as $row) { ?>
+                      <?php foreach ($obat_masuk as $row) { ?>
                     <tr>
                             <td>
                                 <strong><?php echo htmlspecialchars($i++); ?></strong>
                             </td>
                             <td><?php echo htmlspecialchars($row['nama_obat']);?></td>
-                            <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
-                            <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
-                            <td><?php echo htmlspecialchars($row['nama_supplier']);?></td>
-                            <td>80</td>
-                            <td>Januari, 2024</td>
+                            <td><?php echo htmlspecialchars($row['jenis']);?></td>
+                            <td><?php echo htmlspecialchars($row['satuan']);?></td>
+                            <td><?php echo htmlspecialchars($row['supplier']);?></td>
+                            <td><?php echo htmlspecialchars($row['jumlah_masuk']);?></td>
+                            <td><?php echo htmlspecialchars($row['periode']);?></td>
                             <td>
                                 <div class="dropdown">
                                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
