@@ -27,7 +27,6 @@ if ($id_pengguna) {
     $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
 }
 
-// Gantikan pemanggilan query() dengan mysqli_query()
 $conn = mysqli_connect("localhost", "root", "", "db_jasmine");
 if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
