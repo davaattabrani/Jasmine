@@ -170,7 +170,6 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
                         <th>Satuan</th>
                         <th>Jumlah Keluar</th>
                         <th>Kadaluarsa</th>
-                        <th>Stok Akhir</th>
                         <th>Periode</th>
                       </tr>
                     </thead>
@@ -186,7 +185,6 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
                             <td><?php echo htmlspecialchars($row['satuan']);?></td>
                             <td><?php echo htmlspecialchars($row['jumlah_keluar']);?></td>
                             <td><?php echo htmlspecialchars($row['kadaluarsa']);?></td>
-                            <td><?php echo htmlspecialchars($row['stok_akhir']);?></td>
                             <td><?php echo htmlspecialchars($row['periode']);?></td>
                             <td>
                                 <div class="dropdown">

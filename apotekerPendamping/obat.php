@@ -395,30 +395,30 @@ if ($id_pengguna) {
     <script>
         // Menangani event saat modal dibuka
         $('#modalUbahObat').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); // Tombol yang memicu modal
-    var id = button.data('id'); // Ambil data-id
-    var nama = button.data('nama'); // Ambil data-nama
-    var jenis = button.data('jenis'); // Ambil data-jenis
-    var satuan = button.data('satuan'); // Ambil data-satuan
-    var supplier = button.data('supplier'); // Ambil data-supplier
+            var button = $(event.relatedTarget); // Tombol yang memicu modal
+            var id = button.data('id'); // Ambil data-id
+            var nama = button.data('nama'); // Ambil data-nama
+            var jenis = button.data('jenis'); // Ambil data-jenis
+            var satuan = button.data('satuan'); // Ambil data-satuan
+            var supplier = button.data('supplier'); // Ambil data-supplier
 
-    var modal = $(this);
-    modal.find('input[name="id_obat"]').val(id); // Isi ID
-    modal.find('input[name="nama_obat"]').val(nama); // Isi Nama
+            var modal = $(this);
+            modal.find('input[name="id_obat"]').val(id); // Isi ID
+            modal.find('input[name="nama_obat"]').val(nama); // Isi Nama
 
-    // Isi select Jenis
-    modal.find('select[name="id_jenis"] option').each(function () {
-        if ($(this).val() == jenis) {
-            $(this).prop('selected', true); // Setel sebagai selected
-        }
-    });
+            // Isi select Jenis
+            modal.find('select[name="id_jenis"] option').each(function () {
+                if ($(this).val() == jenis) {
+                    $(this).prop('selected', true); // Setel sebagai selected
+                }
+            });
 
-    // Isi select Satuan
-    modal.find('select[name="id_satuan"] option').each(function () {
-        if ($(this).val() == satuan) {
-            $(this).prop('selected', true); // Setel sebagai selected
-        }
-    });
+            // Isi select Satuan
+            modal.find('select[name="id_satuan"] option').each(function () {
+                if ($(this).val() == satuan) {
+                    $(this).prop('selected', true); // Setel sebagai selected
+                }
+            });
 
     // Isi select Supplier
     modal.find('select[name="id_supplier"] option').each(function () {
