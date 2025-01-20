@@ -32,7 +32,7 @@ if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
 }
 
-$obat_keluar_result = mysqli_query($conn, "SELECT 
+$obat_keluar_result = mysqli_query($conn, "SELECT ok.*,
     o.nama_obat,
     j.nama_jenis AS jenis,
     s.nama_satuan AS satuan,
@@ -51,41 +51,52 @@ if ($obat_keluar_result) {
     $obat_keluar = mysqli_fetch_all($obat_keluar_result, MYSQLI_ASSOC);
 }
 
- // Query untuk tabel obat
- $queryObat = "SELECT * FROM obat ORDER BY nama_obat";
- $resObat = mysqli_query($conn, $queryObat);
- if (!$resObat) {
-     die("Query failed: " . mysqli_error($conn));
- } 
- 
- // Query untuk tabel obat
- $queryObatKeluar = "SELECT * FROM obat_keluar ORDER BY jumlah_keluar";
- $resObatKeluar = mysqli_query($conn, $queryObatKeluar);
- if (!$resObatKeluar) {
-     die("Query failed: " . mysqli_error($conn));
- }
- 
+// Ambil data obat_keluar berdasarkan ID yang ingin diubah
+$id_obat_keluar = $_POST['id_obat_keluar'] ?? null; // Ambil ID obat_keluar dari POST
+if ($id_obat_keluar) {
+    $queryDetail = "SELECT * FROM obat_keluar WHERE id_obat_keluar = ?";
+    $stmtDetail = $conn->prepare($queryDetail);
+    $stmtDetail->bind_param("i", $id_obat_keluar);
+    $stmtDetail->execute();
+    $resultDetail = $stmtDetail->get_result();
+    $row = $resultDetail->fetch_assoc(); // Ambil data obat_keluar yang ingin diubah
+}
+
+// Query untuk tabel obat
+$queryObat = "SELECT * FROM obat ORDER BY nama_obat";
+$resObat = mysqli_query($conn, $queryObat);
+if (!$resObat) {
+    die("Query failed: " . mysqli_error($conn)); // Debugging: tampilkan error jika query gagal
+}
+
+// Query untuk tabel obat
+$queryObatKeluar = "SELECT * FROM obat_keluar ORDER BY jumlah_keluar";
+$resObatKeluar = mysqli_query($conn, $queryObatKeluar);
+if (!$resObatKeluar) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
 // Query untuk tabel jenis
- $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
- $resJenis = mysqli_query($conn, $queryJenis);
- if (!$resJenis) {
-     die("Query failed: " . mysqli_error($conn));
- }
+$queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
+$resJenis = mysqli_query($conn, $queryJenis);
+if (!$resJenis) {
+    die("Query failed: " . mysqli_error($conn));
+}
 
- // Query untuk tabel satuan
- $querySatuan = "SELECT id_satuan, nama_satuan FROM satuan ORDER BY nama_satuan";
- $resSatuan = mysqli_query($conn, $querySatuan);
- if (!$resSatuan) {
-     die("Query failed: " . mysqli_error($conn));
- }
+// Query untuk tabel satuan
+$querySatuan = "SELECT id_satuan, nama_satuan FROM satuan ORDER BY nama_satuan";
+$resSatuan = mysqli_query($conn, $querySatuan);
+if (!$resSatuan) {
+    die("Query failed: " . mysqli_error($conn));
+}
 
- // Query untuk tabel supplier
- $querySupplier = "SELECT id_supplier, nama_supplier FROM supplier ORDER BY nama_supplier";
- $resSupplier = mysqli_query($conn, $querySupplier);
- if (!$resSupplier) {
-     die("Query failed: " . mysqli_error($conn));
- }
- 
+// Query untuk tabel supplier
+$querySupplier = "SELECT id_supplier, nama_supplier FROM supplier ORDER BY nama_supplier";
+$resSupplier = mysqli_query($conn, $querySupplier);
+if (!$resSupplier) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
 $dataperiodebulan = "SELECT * FROM periode_bulan";
 $resperiodebulan = mysqli_query($conn, $dataperiodebulan);
 
@@ -106,7 +117,6 @@ $ressupplier = mysqli_query($conn, $datasupplier);
 
 $dataobatkeluar = "SELECT * FROM obat_keluar";
 $resobatkeluar = mysqli_query($conn, $dataobatkeluar);
-
 
 ?>
 <html
@@ -239,57 +249,54 @@ $resobatkeluar = mysqli_query($conn, $dataobatkeluar);
                         </form>
 
                         <form action="prosesUbahObatKeluar.php" method="post">
-    <div class="modal fade" id="modalUbahObatKeluar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalCenterTitle">Ubah Obat</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label for="id" class="form-label">ID</label>
-                            <input type="text" name="id_obat_keluar" class="form-control" placeholder="Masukkan ID Obat Keluar" value="<?php echo isset($row['id_obat_keluar']) ? htmlspecialchars($row['id_obat_keluar']) : ''; ?>" readonly />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label for="nama" class="form-label">Nama Obat</label>
-                            <select name="id_obat" class="form-select">
-                                <option value="">Pilih Obat</option>
-                                <?php
-                                // Mengisi dropdown dengan obat
-                                while ($arrayobat = mysqli_fetch_array($resobat)) {
-                                    $selected = ''; // Reset selected
-                                    if (isset($row['id_obat']) && $arrayobat['id_obat'] == $row['id_obat']) {
-                                        $selected = 'selected'; // Set selected jika ID obat cocok
-                                    }
-                                    echo "<option $selected value='" . $arrayobat['id_obat'] . "'>" . $arrayobat['nama_obat'] . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col mb-0">
-                            <label for="jumlah_keluar" class="form-label">Jumlah Keluar</label>
-                            <input type="text" name="jumlah_keluar" class="form-control" placeholder="Masukkan Jumlah Keluar" value="" />
-                        </div>
-                        <div class="col mb-2">
-                            <label for="kadaluarsa" class="form-label">Jumlah Kadaluarsa</label>
-                            <input type="text" name="kadaluarsa" class="form-control" placeholder="Masukkan Jumlah Kadaluarsa" value="" />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Kembali</button>
-                    <button type="submit" name="submit" class="btn btn-primary">Ubah Data</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
+                          <div class="modal fade" id="modalUbahObatKeluar" tabindex="-1" aria-hidden="true">
+                              <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h5 class="modal-title" id="modalCenterTitle">Ubah Obat Keluar</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                          <div class="row">
+                                              <div class="col mb-3">
+                                                  <label for="id" class="form-label">ID Obat Keluar</label>
+                                                  <input type="text" name="id_obat_keluar" class="form-control" placeholder="ID Obat Keluar" value="<?php echo isset($row['id_obat_keluar']) ? htmlspecialchars($row['id_obat_keluar']) : ''; ?>" readonly />
+                                              </div>
+                                          </div>
+                                          <div class="row">
+                                              <div class="col mb-3">
+                                                  <label for="nama" class="form-label">Nama Obat</label>
+                                                  <select name="id_obat" class="form-select">
+                                                      <option value="">Pilih Obat</option>
+                                                      <?php
+                                                      // Mengisi dropdown dengan data obat
+                                                      while ($arrayobat = mysqli_fetch_array($resobat)) {
+                                                          $selected = (isset($row['id_obat']) && $arrayobat['id_obat'] == $row['id_obat']) ? 'selected' : '';
+                                                          echo "<option $selected value='" . $arrayobat['id_obat'] . "'>" . htmlspecialchars($arrayobat['nama_obat']) . "</option>";
+                                                      }
+                                                      ?>
+                                                  </select>
+                                              </div>
+                                          </div>
+                                          <div class="row g-2">
+                                              <div class="col mb-0">
+                                                  <label for="jumlah_keluar" class="form-label">Jumlah Keluar</label>
+                                                  <input type="text" name="jumlah_keluar" class="form-control" placeholder="Masukkan Jumlah Keluar" value="<?php echo isset($row['jumlah_keluar']) ? htmlspecialchars($row['jumlah_keluar']) : ''; ?>" />
+                                              </div>
+                                              <div class="col mb-0">
+                                                  <label for="kadaluarsa" class="form-label">Jumlah Kadaluarsa</label>
+                                                  <input type="text" name="kadaluarsa" class="form-control" placeholder="Masukkan Jumlah Kadaluarsa" value="<?php echo isset($row['kadaluarsa']) ? htmlspecialchars($row['kadaluarsa']) : ''; ?>" />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Kembali</button>
+                                          <button type="submit" name="submit" class="btn btn-primary">Ubah Data</button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
 
                  <!-- Tabel -->                           
                  <div class="table-responsive text-nowrap">
@@ -326,12 +333,12 @@ $resobatkeluar = mysqli_query($conn, $dataobatkeluar);
                                     </button>
                                     <div class="dropdown-menu">
                                     <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObatKeluar"
-                                      data-id="<?php echo htmlspecialchars($row['id_obat_keluar'] ?? ''); ?>" 
-                                      data-nama="<?php echo htmlspecialchars($row['id_obat'] ?? ''); ?>" 
-                                      data-keluar="<?php echo htmlspecialchars($row['jumlah_keluar'] ?? '0'); ?>"
-                                      data-kadaluarsa="<?php echo htmlspecialchars($row['kadaluarsa'] ?? '0'); ?>">
-                                        <i class="bx bx-edit-alt me-1"></i> Edit
-                                    </a>
+                                    data-id="<?php echo htmlspecialchars($row['id_obat_keluar'] ?? ''); ?>" 
+                                    data-nama="<?php echo htmlspecialchars($row['id_obat'] ?? ''); ?>" 
+                                    data-keluar="<?php echo htmlspecialchars($row['jumlah_keluar'] ?? '0'); ?>"
+                                    data-kadaluarsa="<?php echo htmlspecialchars($row['kadaluarsa'] ?? '0'); ?>">
+                                    <i class="bx bx-edit-alt me-1"></i> Edit
+                                  </a>
                                         <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat_keluar'] ?? '0'; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
                                     </div>
                                 </div>
@@ -388,20 +395,20 @@ $resobatkeluar = mysqli_query($conn, $dataobatkeluar);
         $('#modalUbahObatKeluar').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Tombol yang diklik
     var id = button.data('id'); // Ambil ID obat keluar
-    var nama = button.data('nama'); // Ambil ID obat
+    var idObat = button.data('nama'); // Ambil ID obat
     var keluar = button.data('keluar'); // Ambil jumlah keluar
     var kadaluarsa = button.data('kadaluarsa'); // Ambil kadaluarsa
 
     var modal = $(this);
     modal.find('input[name="id_obat_keluar"]').val(id); // Isi ID
     modal.find('select[name="id_obat"] option').each(function () {
-        if ($(this).val() == nama) { // Pastikan ini menggunakan ID obat
+        if ($(this).val() == idObat) { // Pastikan ini menggunakan ID obat
             $(this).prop('selected', true);
         }
     });
     modal.find('input[name="jumlah_keluar"]').val(keluar); // Isi Jumlah Keluar
     modal.find('input[name="kadaluarsa"]').val(kadaluarsa); // Isi Kadalu
-        });
+});
     </script>
 
     <!-- Script untuk konfirmasi sebelum menghapus data -->
