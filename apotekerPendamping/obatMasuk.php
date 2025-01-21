@@ -32,21 +32,21 @@ if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
 }
 
-$obat_masuk_result = mysqli_query($conn, "SELECT 
+$obat_masuk_result = mysqli_query($conn, "SELECT om.*,
     o.nama_obat,
     j.nama_jenis AS jenis,
     s.nama_satuan AS satuan,
     sup.nama_supplier AS supplier,
     om.jumlah_masuk,
     CONCAT(pb.bulan, ' ', pt.tahun) AS periode
-FROM obat_masuk om
-JOIN obat o ON om.id_obat = o.id_obat
-JOIN jenis j ON o.id_jenis = j.id_jenis
-JOIN satuan s ON o.id_satuan = s.id_satuan
-JOIN supplier sup ON o.id_supplier = sup.id_supplier
-JOIN periode_bulan pb ON om.id_periode_bulan = pb.id_periode_bulan
-JOIN periode_tahun pt ON om.id_periode_tahun = pt.id_periode_tahun
-ORDER BY pt.tahun, pb.bulan");
+    FROM obat_masuk om
+    JOIN obat o ON om.id_obat = o.id_obat
+    JOIN jenis j ON o.id_jenis = j.id_jenis
+    JOIN satuan s ON o.id_satuan = s.id_satuan
+    JOIN supplier sup ON o.id_supplier = sup.id_supplier
+    JOIN periode_bulan pb ON om.id_periode_bulan = pb.id_periode_bulan
+    JOIN periode_tahun pt ON om.id_periode_tahun = pt.id_periode_tahun
+    ORDER BY pt.tahun, pb.bulan");
 
 // Periksa apakah kueri berhasil sebelum melanjutkan
 if (!$obat_masuk_result) {
@@ -58,7 +58,7 @@ if ($obat_masuk_result) {
 }
 
  // Query untuk tabel obat
- $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $queryObat = "SELECT * FROM obat ORDER BY nama_obat";
  $resObat = mysqli_query($conn, $queryObat);
  if (!$resObat) {
      die("Query failed: " . mysqli_error($conn));
@@ -68,13 +68,6 @@ if ($obat_masuk_result) {
  $queryObatMasuk = "SELECT * FROM obat_masuk ORDER BY jumlah_masuk";
  $resObatMasuk = mysqli_query($conn, $queryObatMasuk);
  if (!$resObatMasuk) {
-     die("Query failed: " . mysqli_error($conn));
- }
- 
- // Query untuk tabel obat
- $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
- $resObat = mysqli_query($conn, $queryObat);
- if (!$resObat) {
      die("Query failed: " . mysqli_error($conn));
  }
 
@@ -98,28 +91,6 @@ if ($obat_masuk_result) {
  if (!$resSupplier) {
      die("Query failed: " . mysqli_error($conn));
  }
-
- $row = []; // Inisialisasi $row sebagai array kosong
-if (isset($_GET['id_obat_masuk'])) {
-    $id_obat_masuk = $_GET['id_obat_masuk'];
-    $query = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                    FROM obat o
-                                    JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                    JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                    JOIN supplier sup ON o.id_supplier = sup.id_supplier
-                                    WHERE o.id_obat = '$id_obat'");
-    
-    // Periksa apakah query berhasil dan ada hasil
-    if ($query) {
-        $row = mysqli_fetch_assoc($query);
-        // Cek apakah data ditemukan
-        if (!$row) {
-            die("Data tidak ditemukan untuk ID obat: " . htmlspecialchars($id_obat));
-        }
-    } else {
-        die("Query error: " . mysqli_error($conn));
-    }
-}
  
 $dataperiodebulan = "SELECT * FROM periode_bulan";
 $resperiodebulan = mysqli_query($conn, $dataperiodebulan);
@@ -138,6 +109,9 @@ $ressupplier = mysqli_query($conn, $datasupplier);
 
 $dataobatmasuk = "SELECT * FROM obat_masuk";
 $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
+
+$dataobat = "SELECT * FROM obat";
+$resobat = mysqli_query($conn, $dataobat);
 ?>
 <html
   lang="en"
@@ -262,75 +236,52 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
                         </div>
                         </form>
 
-                        <form action="prosesUbahObat.php" method="post">
-                        <div class="modal fade" id="modalUbahObat" tabindex="-1" aria-hidden="true">
+                        <form action="prosesUbahObatMasuk.php" method="post">
+                        <div class="modal fade" id="modalUbahObatMasuk" tabindex="-1" aria-hidden="true">
                           <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="modalCenterTitle">Ubah Obat</h5>
+                                <h5 class="modal-title" id="modalCenterTitle">Ubah Obat Masuk</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
                                 <div class="row">
                                   <div class="col mb-3">
                                     <label for="id" class="form-label">ID</label>
-                                    <input type="text" name="id_obat" class="form-control" placeholder="Masukkan Nama Obat" value="<?php echo isset($row['id_obat']) ? htmlspecialchars($row['id_obat']) : ''; ?>" readonly />
+                                    <input type="text" name="id_obat_masuk" class="form-control" placeholder="Masukkan Nama Obat Masuk" value="<?php echo isset($row['id_obat_masuk']) ? htmlspecialchars($row['id_obat_masuk']) : ''; ?>" readonly />
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col mb-3">
                                   <label for="nama" class="form-label">Nama Obat</label>
-                                    <input
-                                      type="text"
-                                      name="nama_obat"
-                                      class="form-control"
-                                      placeholder="Masukkan Nama Obat"
-                                      value="<?php echo isset($row['nama_obat']) ? htmlspecialchars($row['nama_obat']) : ''; ?>"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="row g-2">
-                                  <div class="col mb-0">
-                                  <label for="jenis" class="form-label">Jenis</label>
-                                  <select name="id_jenis" class="form-select">
-                                      <option value="">Pilih Jenis</option>
-                                      <?php
-                                      // Menampilkan opsi untuk jenis
-                                      while ($rowJenis = mysqli_fetch_assoc($resJenis)) {
-                                          $selected = (isset($row['id_jenis']) && $row['id_jenis'] == $rowJenis['id_jenis']) ? 'selected' : '';
-                                          echo "<option value='" . $rowJenis['id_jenis'] . "' $selected>" . $rowJenis['nama_jenis'] . "</option>";
-                                      }
-                                      ?>
-                                  </select>
-
-                                  </div>
-                                  <div class="col mb-2">
-                                  <label for="satuan" class="form-label">Satuan</label>
-                                    <select name="id_satuan" id="id_satuan" class="form-select" aria-label="Default select example">
-                                      <option value="">Pilih Satuan</option>
-                                      <?php
-                                        while ($rowSatuan = mysqli_fetch_assoc($resSatuan)) {
-                                            $selected = isset($row['id_satuan']) && $rowSatuan['id_satuan'] == $row['id_satuan'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSatuan['id_satuan'] . "'>" . $rowSatuan['nama_satuan'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                  <select
+                                  name="id_obat"
+                                  class="form-select"
+                                  aria-label="Default select example">
+                                  <option selected>Pilih Obat</option>
+                                  <?php
+                                                      // Mengisi dropdown dengan data obat
+                                                      while ($arrayobat = mysqli_fetch_array($resobat)) {
+                                                          $selected = (isset($row['id_obat']) && $arrayobat['id_obat'] == $row['id_obat']) ? 'selected' : '';
+                                                          echo "<option $selected value='" . $arrayobat['id_obat'] . "'>" . htmlspecialchars($arrayobat['nama_obat']) . "</option>";
+                                                      }
+                                                      ?> 
+                                    </select>    
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col mb-3">
-                                    <label for="supplier" class="form-label">Nama Supplier</label>
-                                    <select name="id_supplier" id="id_supplier" class="form-select" aria-label="Default select example">
-                                      <option value="">Pilih Supplier</option>
-                                      <?php
-                                        while ($rowSupplier = mysqli_fetch_assoc($resSupplier)) {
-                                            $selected = isset($row['id_supplier']) && $rowSupplier['id_supplier'] == $row['id_supplier'] ? 'selected' : '';
-                                            echo "<option $selected value='" . $rowSupplier['id_supplier'] . "'>" . $rowSupplier['nama_supplier'] . "</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                  <label for="jumlah_masuk" class="form-label">Jumlah Masuk</label>
+                                    <input
+                                      type="number"
+                                      name="jumlah_masuk"
+                                      class="form-control"
+                                      placeholder="Masukkan Jumlah Obat Masuk"
+                                      value="<?php echo isset($row['jumlah_masuk']) ? htmlspecialchars($row['jumlah_masuk']) : ''; ?>"
+                                    />
                                   </div>
-                                </div>
+                                </div>          
+                                
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -377,15 +328,15 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
                                         <i class="bx bx-dots-vertical-rounded"></i>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObat"
-                                          data-id="<?php echo htmlspecialchars($row['id_obat']); ?>" 
-                                          data-nama="<?php echo htmlspecialchars($row['nama_obat']); ?>" 
-                                          data-jenis="<?php echo htmlspecialchars($row['id_jenis']); ?>"
-                                          data-satuan="<?php echo htmlspecialchars($row['id_satuan']); ?>" 
-                                          data-supplier="<?php echo htmlspecialchars($row['id_supplier']); ?>">
+                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObatMasuk"
+                                          data-id="<?php echo htmlspecialchars($row['id_obat_masuk'] ?? ''); ?>" 
+                                          data-nama="<?php echo htmlspecialchars($row['id_obat'] ?? ''); ?>" 
+                                          data-masuk="<?php echo htmlspecialchars($row['jumlah_masuk'] ?? ''); ?>"
+                                          data-satuan="<?php echo htmlspecialchars($row['id_satuan'] ?? ''); ?>" 
+                                          data-supplier="<?php echo htmlspecialchars($row['id_supplier'] ?? ''); ?>">
                                           <i class="bx bx-edit-alt me-1"></i> Edit
                                         </a>
-                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat']; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
+                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat'] ?? '0'; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
                                     </div>
                                 </div>
                             </td>
@@ -438,32 +389,24 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
 
     <script>
         // Menangani event saat modal dibuka
-        $('#modalUbahObat').on('show.bs.modal', function (event) {
+        $('#modalUbahObatMasuk').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Tombol yang memicu modal
     var id = button.data('id'); // Ambil data-id
-    var nama = button.data('nama'); // Ambil data-nama
+    var idObat = button.data('nama'); // Ambil data-nama
     var jenis = button.data('jenis'); // Ambil data-jenis
     var satuan = button.data('satuan'); // Ambil data-satuan
     var supplier = button.data('supplier'); // Ambil data-supplier
+    var masuk = button.data('masuk'); // Ambil data-supplier
 
     var modal = $(this);
-    modal.find('input[name="id_obat"]').val(id); // Isi ID
-    modal.find('input[name="nama_obat"]').val(nama); // Isi Nama
-
-    // Isi select Jenis
-    modal.find('select[name="id_jenis"] option').each(function () {
-        if ($(this).val() == jenis) {
-            $(this).prop('selected', true); // Setel sebagai selected
+    modal.find('input[name="id_obat_masuk"]').val(id); // Isi ID
+    modal.find('select[name="id_obat"] option').each(function () {
+        if ($(this).val() == idObat) { // Pastikan ini menggunakan ID obat
+            $(this).prop('selected', true);
         }
     });
-
-    // Isi select Satuan
-    modal.find('select[name="id_satuan"] option').each(function () {
-        if ($(this).val() == satuan) {
-            $(this).prop('selected', true); // Setel sebagai selected
-        }
-    });
-
+    modal.find('input[name="jumlah_masuk"]').val(masuk); // Isi Nama
+    
     // Isi select Supplier
     modal.find('select[name="id_supplier"] option').each(function () {
         if ($(this).val() == supplier) {
@@ -478,7 +421,7 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
     <script>
         function konfirmasiHapus(id) {
             if (confirm('Yakin Ingin Menghapus Data?')) {
-                window.location.href = 'prosesHapusSupplier.php?id_supplier=' + id;
+                window.location.href = 'prosesHapusObatMasuk.php?id_obat_masuk=' + id;
             }
         }
     </script>
