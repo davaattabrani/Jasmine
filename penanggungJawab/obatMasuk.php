@@ -58,7 +58,7 @@ if ($obat_masuk_result) {
 }
 
  // Query untuk tabel obat
- $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $queryObat = "SELECT * FROM obat ORDER BY nama_obat";
  $resObat = mysqli_query($conn, $queryObat);
  if (!$resObat) {
      die("Query failed: " . mysqli_error($conn));
@@ -71,13 +71,6 @@ if ($obat_masuk_result) {
      die("Query failed: " . mysqli_error($conn));
  }
  
- // Query untuk tabel obat
- $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
- $resObat = mysqli_query($conn, $queryObat);
- if (!$resObat) {
-     die("Query failed: " . mysqli_error($conn));
- }
-
 // Query untuk tabel jenis
  $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
  $resJenis = mysqli_query($conn, $queryJenis);
@@ -99,28 +92,6 @@ if ($obat_masuk_result) {
      die("Query failed: " . mysqli_error($conn));
  }
 
- $row = []; // Inisialisasi $row sebagai array kosong
-if (isset($_GET['id_obat_masuk'])) {
-    $id_obat_masuk = $_GET['id_obat_masuk'];
-    $query = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                    FROM obat o
-                                    JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                    JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                    JOIN supplier sup ON o.id_supplier = sup.id_supplier
-                                    WHERE o.id_obat = '$id_obat'");
-    
-    // Periksa apakah query berhasil dan ada hasil
-    if ($query) {
-        $row = mysqli_fetch_assoc($query);
-        // Cek apakah data ditemukan
-        if (!$row) {
-            die("Data tidak ditemukan untuk ID obat: " . htmlspecialchars($id_obat));
-        }
-    } else {
-        die("Query error: " . mysqli_error($conn));
-    }
-}
- 
 $dataperiodebulan = "SELECT * FROM periode_bulan";
 $resperiodebulan = mysqli_query($conn, $dataperiodebulan);
 
@@ -139,6 +110,8 @@ $ressupplier = mysqli_query($conn, $datasupplier);
 $dataobatmasuk = "SELECT * FROM obat_masuk";
 $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
 
+$dataobat = "SELECT * FROM obat";
+$resobat = mysqli_query($conn, $dataobat);
 
 ?>
 <html
@@ -269,7 +242,7 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
                           <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="modalCenterTitle">Ubah Obat</h5>
+                                <h5 class="modal-title" id="modalCenterTitle">Ubah Obat Masuk</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div class="modal-body">
@@ -379,15 +352,15 @@ $resObatMasuk = mysqli_query($conn, $dataobatmasuk);
                                         <i class="bx bx-dots-vertical-rounded"></i>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObat"
-                                          data-id="<?php echo htmlspecialchars($row['id_obat']); ?>" 
-                                          data-nama="<?php echo htmlspecialchars($row['nama_obat']); ?>" 
-                                          data-jenis="<?php echo htmlspecialchars($row['id_jenis']); ?>"
-                                          data-satuan="<?php echo htmlspecialchars($row['id_satuan']); ?>" 
-                                          data-supplier="<?php echo htmlspecialchars($row['id_supplier']); ?>">
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahObatMasuk"
+                                          data-id="<?php echo htmlspecialchars($row['id_obat_masuk'] ?? ''); ?>" 
+                                          data-nama="<?php echo htmlspecialchars($row['id_obat'] ?? ''); ?>" 
+                                          data-masuk="<?php echo htmlspecialchars($row['jumlah_masuk'] ?? ''); ?>"
+                                          data-satuan="<?php echo htmlspecialchars($row['id_satuan'] ?? ''); ?>" 
+                                          data-supplier="<?php echo htmlspecialchars($row['id_supplier'] ?? ''); ?>">
                                           <i class="bx bx-edit-alt me-1"></i> Edit
                                         </a>
-                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat']; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
+                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_obat'] ?? '0'; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
                                     </div>
                                 </div>
                             </td>
