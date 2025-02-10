@@ -1,36 +1,94 @@
 <!DOCTYPE html>
 <?php
-require 'config.php';
+require '../config.php';
+include '../checkRole.php';
+checkRole(['Penanggung Jawab Farmasi']);
+
+// Ambil ID pengguna dari sesi atau sumber lain
+$id_pengguna = $_SESSION['id_pengguna'] ?? null; // Pastikan Anda menyimpan ID pengguna saat login
+
+if ($id_pengguna) {
+    // Pastikan $conn terdefinisi
+    if (isset($conn)) {
+        // Query untuk mendapatkan nama pengguna berdasarkan ID
+        $stmt = $conn->prepare("SELECT nama_pengguna, jabatan FROM pengguna WHERE id_pengguna = ?");
+        $stmt->bind_param("i", $id_pengguna); // Mengikat parameter dengan tipe integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        // Pastikan nama_pengguna ada
+        $nama_pengguna = $user['nama_pengguna'] ?? 'Guest';
+        $jabatan = $user['jabatan'] ?? 'Guest';
+    } else {
+        $nama_pengguna = 'Guest'; // Jika koneksi gagal, gunakan nilai default
+    }
+} else {
+    $nama_pengguna = 'Guest'; // Jika tidak ada ID pengguna, gunakan nilai default
+}
+
 // Gantikan pemanggilan query() dengan mysqli_query()
 $conn = mysqli_connect("localhost", "root", "", "db_jasmine");
 if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
 }
 
-$stok_result = mysqli_query($conn, "SELECT s.*, o.nama_obat, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                        FROM stok s
-                                        JOIN obat o ON s.id_obat = o.id_obat
-                                        JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                        JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                        JOIN supplier sup ON o.id_supplier = sup.id_supplier");
+$obat_keluar_result = mysqli_query($conn, "SELECT 
+    o.nama_obat, 
+    j.nama_jenis AS jenis, 
+    s.nama_satuan AS satuan, 
+    sp.nama_supplier,
+    ok.kadaluarsa,
+    CONCAT(pb.bulan, ' ', pt.tahun) AS periode
+FROM obat_keluar ok
+JOIN obat o ON ok.id_obat = o.id_obat
+JOIN jenis j ON o.id_jenis = j.id_jenis
+JOIN satuan s ON o.id_satuan = s.id_satuan
+JOIN supplier sp ON o.id_supplier = sp.id_supplier
+JOIN periode_bulan pb ON ok.id_periode_bulan = pb.id_periode_bulan
+JOIN periode_tahun pt ON ok.id_periode_tahun = pt.id_periode_tahun
+WHERE (pt.tahun, pb.id_periode_bulan) = (
+    SELECT MAX(pt2.tahun), MAX(pb2.id_periode_bulan)
+    FROM obat_keluar ok2
+    JOIN periode_bulan pb2 ON ok2.id_periode_bulan = pb2.id_periode_bulan
+    JOIN periode_tahun pt2 ON ok2.id_periode_tahun = pt2.id_periode_tahun
+)
+AND ok.kadaluarsa > 0;
+");
 
-// Periksa apakah kueri berhasil sebelum melanjutkan
-if (!$stok_result) {
+
+
+if (!$obat_keluar_result) {
     die("Query error: " . mysqli_error($conn));
 }
 
-if ($stok_result) {
-    $stok = mysqli_fetch_all($stok_result, MYSQLI_ASSOC);
+
+if ($obat_keluar_result) {
+    $obat_keluar = mysqli_fetch_all($obat_keluar_result, MYSQLI_ASSOC);
 }
 
- // Query untuk tabel stok
- $queryStok = "SELECT * FROM stok ORDER BY stok";
- $resStok = mysqli_query($conn, $queryStok);
- if (!$resStok) {
+ // Query untuk tabel obat
+ $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $resObat = mysqli_query($conn, $queryObat);
+ if (!$resObat) {
+     die("Query failed: " . mysqli_error($conn));
+ } 
+ 
+ // Query untuk tabel obat
+ $queryObatKeluar = "SELECT id_obat_keluar, jumlah_keluar FROM obat_keluar ORDER BY jumlah_keluar";
+ $resObatKeluar = mysqli_query($conn, $queryObatKeluar);
+ if (!$resObatKeluar) {
+     die("Query failed: " . mysqli_error($conn));
+ }
+ 
+ // Query untuk tabel obat
+ $queryObat = "SELECT id_obat, nama_obat FROM obat ORDER BY nama_obat";
+ $resObat = mysqli_query($conn, $queryObat);
+ if (!$resObat) {
      die("Query failed: " . mysqli_error($conn));
  }
 
- // Query untuk tabel jenis
+// Query untuk tabel jenis
  $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
  $resJenis = mysqli_query($conn, $queryJenis);
  if (!$resJenis) {
@@ -51,14 +109,24 @@ if ($stok_result) {
      die("Query failed: " . mysqli_error($conn));
  }
 
+ 
+$dataperiodebulan = "SELECT * FROM periode_bulan";
+$resperiodebulan = mysqli_query($conn, $dataperiodebulan);
+
+$dataperiodetahun = "SELECT * FROM periode_tahun";
+$resperiodetahun = mysqli_query($conn, $dataperiodetahun);
+
 $datajenis = "SELECT * FROM jenis";
 $resjenis = mysqli_query($conn, $datajenis);
+
 $datasatuan = "SELECT * FROM satuan";
 $ressatuan = mysqli_query($conn, $datasatuan);
+
 $datasupplier = "SELECT * FROM supplier";
 $ressupplier = mysqli_query($conn, $datasupplier);
-$datastok = "SELECT * FROM stok";
-$resstok = mysqli_query($conn, $datastok);
+
+$dataobatkeluar = "SELECT * FROM obat_keluar";
+$resObatKeluar = mysqli_query($conn, $dataobatkeluar);
 
 ?>
 <html
@@ -92,41 +160,61 @@ $resstok = mysqli_query($conn, $datastok);
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Beranda /</span> Stok
+                <span class="text-muted fw-light">Beranda /</span> Kadaluarsa
               </h4>
 
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Data Stok</h5>
+                    <h5 class="mb-0">Data Obat Keluar</h5>
+                    <div class="col-sm-2">
+                      <select class="form-control" id="tahun" name="tahun">
+                          <?php
+                          for ($i = date('Y'); $i >= 2022; $i--) {
+                              echo "<option value='$i'>$i</option>";
+                          }
+                          ?>
+                      </select>
+                    </div>
+                    <div class="col-sm-2">
+                      <select class="form-control" id="tahun" name="tahun">
+                          <?php
+                          for ($i = date('Y'); $i >= 2022; $i--) {
+                              echo "<option value='$i'>$i</option>";
+                          }
+                          ?>
+                      </select>
+                    </div>
+                    <form class="d-flex">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="tf-icons bx bx-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search..." />
+                      </div>
+                    </form>
                 </div>
-                
-
 
                  <!-- Tabel -->                           
-                <div class="table-responsive text-nowrap">
+                 <div class="table-responsive text-nowrap">
                   <table class="table table-striped">
                     <thead>
                       <tr>
                         <th>No</th>
                         <th>Nama Obat</th>
-                        <th>Jenis</th>
                         <th>Satuan</th>
-                        <th>Stok Akhir</th>
-                        <th>Status</th>
+                        <th>Kadaluarsa</th>
+                        <th>Periode</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
                       <?php $i = 1; ?>
-                      <?php foreach ($stok as $row) { ?>
+                      <?php foreach ($obat_keluar as $row) { ?>
                     <tr>
                             <td>
                                 <strong><?php echo htmlspecialchars($i++); ?></strong>
                             </td>
                             <td><?php echo htmlspecialchars($row['nama_obat']);?></td>
-                            <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
-                            <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
-                            <td><?php echo htmlspecialchars($row['stok']);?></td>
-                            <td><?php echo ($row['stok'] > 5) ? 'Aman' : 'Tidak Aman'; ?></td>
+                            <td><?php echo htmlspecialchars($row['satuan']);?></td>
+                            <td><?php echo htmlspecialchars($row['kadaluarsa']);?></td>
+                            <td><?php echo htmlspecialchars($row['periode']);?></td>
                         </tr>
                         <?php } ?>
                     </tbody>

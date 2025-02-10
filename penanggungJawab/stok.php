@@ -33,43 +33,29 @@ if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
 }
 
-$obat_result = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                        FROM obat o
+$stok_result = mysqli_query($conn, "SELECT s.*, o.nama_obat, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
+                                        FROM stok s
+                                        JOIN obat o ON s.id_obat = o.id_obat
                                         JOIN jenis jen ON o.id_jenis = jen.id_jenis
                                         JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                        JOIN supplier sup ON o.id_supplier = sup.id_supplier");
+                                        JOIN supplier sup ON o.id_supplier = sup.id_supplier
+                                        ORDER BY s.id_stok");
 
 // Periksa apakah kueri berhasil sebelum melanjutkan
-if (!$obat_result) {
+if (!$stok_result) {
     die("Query error: " . mysqli_error($conn));
 }
 
-if ($obat_result) {
-    $obat = mysqli_fetch_all($obat_result, MYSQLI_ASSOC);
+if ($stok_result) {
+    $stok = mysqli_fetch_all($stok_result, MYSQLI_ASSOC);
 }
 
-// Tambahkan logika untuk mendapatkan data pengguna berdasarkan ID
-$row = []; // Inisialisasi $row sebagai array kosong
-if (isset($_GET['id_obat'])) {
-    $id_obat = $_GET['id_obat'];
-    $query = mysqli_query($conn, "SELECT o.*, jen.nama_jenis, sat.nama_satuan, sup.nama_supplier 
-                                    FROM obat o
-                                    JOIN jenis jen ON o.id_jenis = jen.id_jenis
-                                    JOIN satuan sat ON o.id_satuan = sat.id_satuan
-                                    JOIN supplier sup ON o.id_supplier = sup.id_supplier
-                                    WHERE o.id_obat = '$id_obat'");
-    
-    // Periksa apakah query berhasil dan ada hasil
-    if ($query) {
-        $row = mysqli_fetch_assoc($query);
-        // Cek apakah data ditemukan
-        if (!$row) {
-            die("Data tidak ditemukan untuk ID obat: " . htmlspecialchars($id_obat));
-        }
-    } else {
-        die("Query error: " . mysqli_error($conn));
-    }
-}
+ // Query untuk tabel stok
+ $queryStok = "SELECT * FROM stok ORDER BY stok";
+ $resStok = mysqli_query($conn, $queryStok);
+ if (!$resStok) {
+     die("Query failed: " . mysqli_error($conn));
+ }
 
  // Query untuk tabel jenis
  $queryJenis = "SELECT id_jenis, nama_jenis FROM jenis ORDER BY nama_jenis";
@@ -98,6 +84,8 @@ $datasatuan = "SELECT * FROM satuan";
 $ressatuan = mysqli_query($conn, $datasatuan);
 $datasupplier = "SELECT * FROM supplier";
 $ressupplier = mysqli_query($conn, $datasupplier);
+$datastok = "SELECT * FROM stok";
+$resstok = mysqli_query($conn, $datastok);
 
 ?>
 <html
@@ -137,27 +125,31 @@ $ressupplier = mysqli_query($conn, $datasupplier);
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Stok</h5>
+                    <form class="d-flex">
+                          <div class="input-group">
+                            <span class="input-group-text"><i class="tf-icons bx bx-search"></i></span>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
+                          </div>
+                        </form>
                 </div>
-                
 
 
                  <!-- Tabel -->                           
                 <div class="table-responsive text-nowrap">
-                  <table class="table table-striped">
+                  <table class="table table-striped" id="dataTable">
                     <thead>
                       <tr>
                         <th>No</th>
                         <th>Nama Obat</th>
                         <th>Jenis</th>
                         <th>Satuan</th>
-                        <th>Obat Keluar</th>
-                        <th>Kadaluarsa</th>
                         <th>Stok Akhir</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
                       <?php $i = 1; ?>
-                      <?php foreach ($obat as $row) { ?>
+                      <?php foreach ($stok as $row) { ?>
                     <tr>
                             <td>
                                 <strong><?php echo htmlspecialchars($i++); ?></strong>
@@ -165,13 +157,19 @@ $ressupplier = mysqli_query($conn, $datasupplier);
                             <td><?php echo htmlspecialchars($row['nama_obat']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_jenis']);?></td>
                             <td><?php echo htmlspecialchars($row['nama_satuan']);?></td>
-                            <td>11</td>
-                            <td>0</td>
-                            <td>25</td>
+                            <td><?php echo htmlspecialchars($row['stok']);?></td>
+                            <td>
+                                <?php if ($row['stok'] < 5): ?>
+                                    <i class="bx bx-error"></i>
+                                <?php else: ?>
+                                    <?php echo ''; ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php } ?>
                     </tbody>
-                  </table>
+                </table>
+                <div id="pagination" class="d-flex justify-content-center" style="margin-top: 20px;"></div>
                 </div>
               </div>
             </div>
@@ -249,6 +247,254 @@ $ressupplier = mysqli_query($conn, $datasupplier);
             $(this).prop('selected', true); // Setel sebagai selected
         }
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let table = document.getElementById("dataTable");
+    let rows = table.getElementsByTagName("tr");
+    let rowsPerPage = 10;
+    let currentPage = 1;
+    let maxVisibleButtons = 10; // Maksimal 10 tombol paginasi yang ditampilkan
+
+    function showPage(page) {
+        let start = (page - 1) * rowsPerPage + 1; // +1 untuk menghindari header
+        let end = start + rowsPerPage;
+
+        for (let i = 1; i < rows.length; i++) {
+            rows[i].style.display = (i >= start && i < end) ? "" : "none";
+        }
+    }
+
+    function setupPagination() {
+        let totalPages = Math.ceil((rows.length - 1) / rowsPerPage);
+        let paginationContainer = document.getElementById("pagination");
+        paginationContainer.innerHTML = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item prev">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item next">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>`;
+
+        let paginationList = paginationContainer.querySelector(".pagination");
+        let prevButton = paginationList.querySelector(".prev");
+        let nextButton = paginationList.querySelector(".next");
+
+        function renderPageButtons() {
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+            // Jika halaman terakhir kurang dari maxVisibleButtons, geser ke belakang
+            if (endPage - startPage + 1 < maxVisibleButtons) {
+                startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+            }
+
+            // Bersihkan tombol yang lama
+            document.querySelectorAll(".pagination .page-item.number").forEach(el => el.remove());
+
+            // Tambahkan tombol halaman
+            for (let i = startPage; i <= endPage; i++) {
+                let listItem = document.createElement("li");
+                listItem.classList.add("page-item", "number");
+                if (i === currentPage) listItem.classList.add("active");
+
+                let link = document.createElement("a");
+                link.classList.add("page-link");
+                link.href = "javascript:void(0);";
+                link.innerText = i;
+                link.addEventListener("click", function () {
+                    currentPage = i;
+                    showPage(currentPage);
+                    renderPageButtons();
+                });
+
+                listItem.appendChild(link);
+                paginationList.insertBefore(listItem, nextButton);
+            }
+
+            // Tambahkan tombol "..." jika masih ada halaman sebelum dan sesudah
+            if (startPage > 1) {
+                let dots = document.createElement("li");
+                dots.classList.add("page-item", "disabled", "number");
+                dots.innerHTML = `<a class="page-link" href="javascript:void(0);">...</a>`;
+                paginationList.insertBefore(dots, paginationList.querySelector(".number"));
+            }
+
+            if (endPage < totalPages) {
+                let dots = document.createElement("li");
+                dots.classList.add("page-item", "disabled", "number");
+                dots.innerHTML = `<a class="page-link" href="javascript:void(0);">...</a>`;
+                paginationList.insertBefore(dots, nextButton);
+            }
+        }
+
+        prevButton.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+                renderPageButtons();
+            }
+        });
+
+        nextButton.addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+                renderPageButtons();
+            }
+        });
+
+        showPage(currentPage);
+        renderPageButtons();
+    }
+
+    setupPagination();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let table = document.getElementById("dataTable");
+    let rows = table.getElementsByTagName("tr");
+    let rowsPerPage = 10;
+    let currentPage = 1;
+    let maxVisibleButtons = 10;
+    let searchInput = document.getElementById("searchInput");
+
+    function showPage(page) {
+        let start = (page - 1) * rowsPerPage + 1; // +1 untuk menghindari header
+        let end = start + rowsPerPage;
+        let visibleRows = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+            if (rows[i].style.display !== "none") {
+                visibleRows++;
+                rows[i].style.display = (visibleRows >= start && visibleRows < end) ? "" : "none";
+            }
+        }
+    }
+
+    function filterTable() {
+        let filter = searchInput.value.toLowerCase();
+        let visibleCount = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+            let nameCell = rows[i].getElementsByTagName("td")[1]; // Kolom nama obat
+
+            if (nameCell) {
+                let textValue = nameCell.textContent || nameCell.innerText;
+                if (textValue.toLowerCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                    visibleCount++;
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        currentPage = 1; // Reset ke halaman pertama saat filter diterapkan
+        setupPagination(visibleCount);
+        showPage(currentPage);
+    }
+
+    function setupPagination(filteredRowsCount) {
+        let totalRows = filteredRowsCount || (rows.length - 1);
+        let totalPages = Math.ceil(totalRows / rowsPerPage);
+        let paginationContainer = document.getElementById("pagination");
+
+        paginationContainer.innerHTML = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item prev">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item next">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>`;
+
+        let paginationList = paginationContainer.querySelector(".pagination");
+        let prevButton = paginationList.querySelector(".prev");
+        let nextButton = paginationList.querySelector(".next");
+
+        function renderPageButtons() {
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+            if (endPage - startPage + 1 < maxVisibleButtons) {
+                startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+            }
+
+            document.querySelectorAll(".pagination .page-item.number").forEach(el => el.remove());
+
+            for (let i = startPage; i <= endPage; i++) {
+                let listItem = document.createElement("li");
+                listItem.classList.add("page-item", "number");
+                if (i === currentPage) listItem.classList.add("active");
+
+                let link = document.createElement("a");
+                link.classList.add("page-link");
+                link.href = "javascript:void(0);";
+                link.innerText = i;
+                link.addEventListener("click", function () {
+                    currentPage = i;
+                    showPage(currentPage);
+                    renderPageButtons();
+                });
+
+                listItem.appendChild(link);
+                paginationList.insertBefore(listItem, nextButton);
+            }
+
+            if (startPage > 1) {
+                let dots = document.createElement("li");
+                dots.classList.add("page-item", "disabled", "number");
+                dots.innerHTML = `<a class="page-link" href="javascript:void(0);">...</a>`;
+                paginationList.insertBefore(dots, paginationList.querySelector(".number"));
+            }
+
+            if (endPage < totalPages) {
+                let dots = document.createElement("li");
+                dots.classList.add("page-item", "disabled", "number");
+                dots.innerHTML = `<a class="page-link" href="javascript:void(0);">...</a>`;
+                paginationList.insertBefore(dots, nextButton);
+            }
+        }
+
+        prevButton.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+                renderPageButtons();
+            }
+        });
+
+        nextButton.addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+                renderPageButtons();
+            }
+        });
+
+        showPage(currentPage);
+        renderPageButtons();
+    }
+
+    searchInput.addEventListener("keyup", filterTable);
+
+    setupPagination();
 });
 
     </script>

@@ -25,22 +25,10 @@
 
             <!-- Stok -->
             <li class="menu-item">
-              <a href="javascript:void(0)" class="menu-link menu-toggle">
+              <a href="stok.php" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-capsule"></i>
-                <div data-i18n="Monitoring">Monitoring Obat</div>
+                <div data-i18n="Tables">Monitoring Stok</div>
               </a>
-              <ul class="menu-sub">
-                <li class="menu-item">
-                  <a href="stok.php" class="menu-link">
-                    <div data-i18n="Tables">Monitoring Stok</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="kadaluarsa.php" class="menu-link">
-                    <div data-i18n="Tables">Monitoring Kadaluarsa</div>
-                  </a>
-                </li>
-              </ul>
             </li>
 
             <!-- Pengadaan -->

@@ -39,6 +39,7 @@ $obat_keluar_result = mysqli_query($conn, "SELECT
     s.nama_satuan AS satuan,
     ok.jumlah_keluar,
     ok.kadaluarsa,
+    pb.id_periode_bulan,
     (ok.jumlah_keluar - ok.kadaluarsa) AS stok_akhir,
     CONCAT(pb.bulan, ' ', pt.tahun) AS periode
 FROM obat_keluar ok
@@ -47,7 +48,7 @@ JOIN jenis j ON o.id_jenis = j.id_jenis
 JOIN satuan s ON o.id_satuan = s.id_satuan
 JOIN periode_bulan pb ON ok.id_periode_bulan = pb.id_periode_bulan
 JOIN periode_tahun pt ON ok.id_periode_tahun = pt.id_periode_tahun
-ORDER BY pt.tahun, pb.bulan");
+ORDER BY ok.id_obat_keluar");
 
 // Periksa apakah kueri berhasil sebelum melanjutkan
 if (!$obat_keluar_result) {
@@ -157,20 +158,44 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Obat Keluar</h5>
+                    <div class="col-sm-2">
+                      <select class="form-control" id="tahun" name="tahun">
+                          <?php
+                          for ($i = date('Y'); $i >= 2022; $i--) {
+                              echo "<option value='$i'>$i</option>";
+                          }
+                          ?>
+                      </select>
+                    </div>
+                    <div class="col-sm-2">
+                      <select class="form-control" id="tahun" name="tahun">
+                          <?php
+                          for ($i = date('Y'); $i >= 2022; $i--) {
+                              echo "<option value='$i'>$i</option>";
+                          }
+                          ?>
+                      </select>
+                    </div>
+                    <form class="d-flex">
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="tf-icons bx bx-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
+                      </div>
+                    </form>
                 </div>
 
                  <!-- Tabel -->                           
                  <div class="table-responsive text-nowrap">
-                  <table class="table table-striped">
+                  <table class="table table-striped" id="dataTable">
                     <thead>
                       <tr>
-                        <th>No</th>
+                        <th>No <i class="bx bx-sort" id="sortNoIcon" style="cursor: pointer;"></th>
                         <th>Nama Obat</th>
                         <th>Jenis</th>
                         <th>Satuan</th>
                         <th>Jumlah Keluar</th>
                         <th>Kadaluarsa</th>
-                        <th>Periode</th>
+                        <th>Periode <i class="bx bx-sort" id="sortPeriodeIcon" style="cursor: pointer;"></th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
@@ -185,7 +210,7 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
                             <td><?php echo htmlspecialchars($row['satuan']);?></td>
                             <td><?php echo htmlspecialchars($row['jumlah_keluar']);?></td>
                             <td><?php echo htmlspecialchars($row['kadaluarsa']);?></td>
-                            <td><?php echo htmlspecialchars($row['periode']);?></td>
+                            <td data-id-periode="<?php echo htmlspecialchars($row['id_periode_bulan']); ?>"><?php echo htmlspecialchars($row['periode']);?></td>
                             <td>
                                 <div class="dropdown">
                                     <div class="dropdown-menu">
@@ -202,6 +227,7 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
                         <?php } ?>
                     </tbody>
                   </table>
+                  <div id="pagination" class="d-flex justify-content-center" style="margin-top: 20px;"></div>
                 </div>
               </div>
             </div>
@@ -280,6 +306,144 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    let table = document.getElementById("dataTable");
+    let tbody = table.querySelector("tbody");
+    let allRows = Array.from(tbody.querySelectorAll("tr")); // Menyimpan semua data awal
+    let filteredRows = [...allRows]; // Data yang digunakan saat search atau sort
+    let searchInput = document.getElementById("searchInput");
+    let paginationContainer = document.getElementById("pagination");
+    let sortIcon = document.getElementById("sortPeriodeIcon");
+
+    let rowsPerPage = 10;
+    let currentPage = 1;
+    let maxVisibleButtons = 10;
+    let sortDirection = 1; // 1 = Ascending, -1 = Descending
+
+    function showPage(page) {
+        currentPage = page;
+        let start = (page - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        filteredRows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+        });
+
+        updatePagination();
+    }
+
+    function updatePagination() {
+        let totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+        paginationContainer.innerHTML = `
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item prev ${currentPage === 1 ? "disabled" : ""}">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item next ${currentPage === totalPages ? "disabled" : ""}">
+                        <a class="page-link" href="javascript:void(0);">
+                            <i class="tf-icon bx bx-chevrons-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>`;
+
+        let paginationList = paginationContainer.querySelector(".pagination");
+        let prevButton = paginationList.querySelector(".prev");
+        let nextButton = paginationList.querySelector(".next");
+
+        prevButton.addEventListener("click", function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+
+        nextButton.addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        });
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            let pageItem = document.createElement("li");
+            pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+            pageItem.innerHTML = `<a class="page-link" href="javascript:void(0);">${i}</a>`;
+            pageItem.addEventListener("click", () => showPage(i));
+            paginationList.insertBefore(pageItem, nextButton);
+        }
+    }
+
+    searchInput.addEventListener("input", function () {
+        let searchTerm = searchInput.value.toLowerCase();
+        filteredRows = allRows.filter(row => row.cells[1].textContent.toLowerCase().includes(searchTerm));
+
+        // Reset tampilan
+        tbody.innerHTML = "";
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        showPage(1);
+    });
+
+    sortIcon.addEventListener("click", function () {
+    filteredRows.sort((rowA, rowB) => {
+        let periodeA = parseInt(rowA.cells[6].getAttribute("data-id-periode")) || 0;
+        let periodeB = parseInt(rowB.cells[6].getAttribute("data-id-periode")) || 0;
+
+        return (periodeA - periodeB) * sortDirection;
+    });
+
+    sortDirection *= -1;
+    tbody.innerHTML = "";
+    filteredRows.forEach(row => tbody.appendChild(row));
+
+    showPage(1);
+
+    if (sortDirection === 1) {
+        sortIcon.classList.remove("bx-sort-down");
+        sortIcon.classList.add("bx-sort-up");
+    } else {
+        sortIcon.classList.remove("bx-sort-up");
+        sortIcon.classList.add("bx-sort-down");
+    }
+});
+
+let sortNoDirection = 1; // 1 = Ascending, -1 = Descending
+let sortNoIcon = document.getElementById("sortNoIcon");
+
+sortNoIcon.addEventListener("click", function () {
+    filteredRows.sort((rowA, rowB) => {
+        let noA = parseInt(rowA.cells[0].textContent.trim()) || 0;
+        let noB = parseInt(rowB.cells[0].textContent.trim()) || 0;
+
+        return (noA - noB) * sortNoDirection;
+    });
+
+    sortNoDirection *= -1;
+    tbody.innerHTML = "";
+    filteredRows.forEach(row => tbody.appendChild(row));
+
+    showPage(1);
+
+    if (sortNoDirection === 1) {
+        sortNoIcon.classList.remove("bx-sort-down");
+        sortNoIcon.classList.add("bx-sort-up");
+    } else {
+        sortNoIcon.classList.remove("bx-sort-up");
+        sortNoIcon.classList.add("bx-sort-down");
+    }
+});
+
+
+
+    showPage(1);
+});
+
 
     </script>
 
