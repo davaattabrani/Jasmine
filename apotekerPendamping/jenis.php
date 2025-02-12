@@ -113,6 +113,7 @@ if ($id_pengguna) {
                                       name="nama_jenis"
                                       class="form-control"
                                       placeholder="Masukkan Nama Jenis"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -164,6 +165,7 @@ if ($id_pengguna) {
                                       class="form-control"
                                       placeholder="Masukkan Nama Jenis"
                                       value="<?php echo isset($row) ? htmlspecialchars($row['nama_jenis']) : ''; ?>"
+                                      required
                                     />
                                   </div>
                                 </div>

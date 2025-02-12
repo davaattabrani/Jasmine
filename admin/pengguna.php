@@ -89,6 +89,7 @@ if (isset($_GET['id_pengguna'])) {
                                       name="nama_pengguna"
                                       class="form-control"
                                       placeholder="Masukkan Nama"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -100,6 +101,7 @@ if (isset($_GET['id_pengguna'])) {
                                       name="username"
                                       class="form-control"
                                       placeholder="Masukkan Username"
+                                      required
                                     />
                                   </div>
                                   <div class="col mb-2">
@@ -108,7 +110,8 @@ if (isset($_GET['id_pengguna'])) {
                                       type="password"
                                       name="password"
                                       class="form-control"
-                                      placeholder="Masukkan Password"
+                                      placeholder="Masukkan Password" 
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -119,7 +122,7 @@ if (isset($_GET['id_pengguna'])) {
                                       name="jabatan"
                                       class="form-select"
                                       aria-label="Default select example">
-                                      <option selected>Pilih Jabatan</option>
+                                      <option disable selected>Pilih Jabatan</option>
                                       <option value="Penanggung Jawab Farmasi">Penanggung Jawab Farmasi</option>
                                       <option value="Apoteker Pendamping">Apoteker Pendamping</option>
                                     </select>
@@ -173,6 +176,7 @@ if (isset($_GET['id_pengguna'])) {
                                       class="form-control"
                                       placeholder="Masukkan Nama"
                                       value="<?php echo isset($row) ? htmlspecialchars($row['nama_pengguna']) : ''; ?>"
+                                      required
                                     />
                                   </div>
                                 </div>
@@ -185,6 +189,7 @@ if (isset($_GET['id_pengguna'])) {
                                       class="form-control"
                                       placeholder="Masukkan Username"
                                       value="<?php echo isset($row) ? htmlspecialchars($row['username']) : ''; ?>"
+                                      required
                                     />
                                   </div>
                                   <div class="col mb-2">
@@ -195,6 +200,7 @@ if (isset($_GET['id_pengguna'])) {
                                       class="form-control"
                                       placeholder="Masukkan Password"
                                       value="<?php echo isset($row) ? htmlspecialchars($row['password']) : ''; ?>"
+                                      required
                                     />
                                   </div>
                                 </div>
