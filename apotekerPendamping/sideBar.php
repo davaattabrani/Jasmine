@@ -54,13 +54,25 @@
                 <div data-i18n="Analytics">Supplier</div>
               </a>
             </li>
-
-            <!-- Periode -->
+            
+            <!--  Periode -->
             <li class="menu-item">
-              <a href="periode.php" class="menu-link">
+              <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-calendar"></i>
-                <div data-i18n="Tables">Periode</div>
+                <div data-i18n="Monitoring">Periode</div>
               </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="periodeBulan.php" class="menu-link">
+                    <div data-i18n="Tables">Bulan</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="periodeTahun.php" class="menu-link">
+                    <div data-i18n="Tables">Tahun</div>
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <!-- Obat Masuk -->

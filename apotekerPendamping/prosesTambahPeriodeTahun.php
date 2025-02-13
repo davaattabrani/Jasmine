@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 require_once '../config.php';
 
 if (isset($_POST['submit'])) {
-    $bulan = $_POST['bulan'];
     $tahun = $_POST['tahun'];
 
     // Cek koneksi database
@@ -13,23 +12,23 @@ if (isset($_POST['submit'])) {
     }
 
     // Tambahkan pengecekan apakah bulan dan tahun sudah ada
-    $check_query = "SELECT * FROM periode WHERE bulan = ? AND tahun = ?";
+    $check_query = "SELECT * FROM periode_tahun WHERE tahun = ? ";
     $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param("ss", $bulan, $tahun);
+    $check_stmt->bind_param("s", $tahun);
     $check_stmt->execute();
     $check_stmt->store_result();
 
     if ($check_stmt->num_rows > 0) {
-        echo "<script>window.alert('Periode untuk bulan dan tahun ini sudah ada.'); window.history.back();</script>";
+        echo "<script>window.alert('Periode untuk tahun ini sudah ada.'); window.history.back();</script>";
         exit();
     }
 
-    $query = "INSERT INTO periode (bulan, tahun) VALUES (?, ?)";
+    $query = "INSERT INTO periode_tahun (tahun) VALUES (?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $bulan, $tahun);
+    $stmt->bind_param("s", $tahun);
     
     // Debugging: Tampilkan data yang akan dimasukkan
-    var_dump($bulan, $tahun);
+    var_dump($tahun);
 
     if (!$stmt->execute()) {
         echo "Error: " . $stmt->error; // Menampilkan kesalahan jika ada
@@ -37,7 +36,7 @@ if (isset($_POST['submit'])) {
         if ($stmt->affected_rows > 0) {
             echo "Periode baru berhasil ditambahkan!";
             echo "<script>window.alert('Data berhasil ditambah.');</script>"; // Menampilkan alert
-            echo "<script>window.location.href = 'periode.php';</script>"; // Redirect ke periode.php
+            echo "<script>window.location.href = 'periodeTahun.php';</script>"; // Redirect ke periode.php
             exit();
         } else {
             echo "Gagal menambahkan periode baru.";

@@ -8,14 +8,14 @@ if (!$conn) {
 }
 
 // Periksa apakah id_pengguna ada dalam parameter GET
-if (isset($_GET['id_periode'])) {
-    $id_periode = $_GET['id_periode'];
+if (isset($_GET['id_periode_tahun'])) {
+    $id_periode_tahun = $_GET['id_periode_tahun'];
 
     // Siapkan dan jalankan query untuk menghapus pengguna
-    $query = "DELETE FROM periode WHERE id_periode = '$id_periode'";
+    $query = "DELETE FROM periode_tahun WHERE id_periode_tahun = '$id_periode_tahun'";
     if (mysqli_query($conn, $query)) {
         // Redirect atau tampilkan pesan sukses
-        header("Location: periode.php?message=Periode berhasil dihapus");
+        header("Location: periodeTahun.php?message=Periode berhasil dihapus");
         exit();
     } else {
         die("Error deleting record: " . mysqli_error($conn));

@@ -10,21 +10,21 @@ if (!$conn) {
     die("Koneksi ke basis data gagal: " . mysqli_connect_error());
 }
 
-$periode_result = mysqli_query($conn, "SELECT * FROM periode");
+$periode_bulan_result = mysqli_query($conn, "SELECT * FROM periode_bulan");
 
 // Periksa apakah kueri berhasil sebelum melanjutkan
-if (!$periode_result) {
+if (!$periode_bulan_result) {
     die("Query error: " . mysqli_error($conn));
 }
 
-if ($periode_result) {
-    $periode = mysqli_fetch_all($periode_result, MYSQLI_ASSOC);
+if ($periode_bulan_result) {
+    $periode_bulan = mysqli_fetch_all($periode_bulan_result, MYSQLI_ASSOC);
 }
 
 // Tambahkan logika untuk mendapatkan data pengguna berdasarkan ID
-if (isset($_GET['id_periode'])) {
-    $id_periode = $_GET['id_periode'];
-    $query = mysqli_query($conn, "SELECT * FROM periode WHERE id_periode = '$id_periode'");
+if (isset($_GET['id_periode_bulan'])) {
+    $id_periode_bulan = $_GET['id_periode_bulan'];
+    $query = mysqli_query($conn, "SELECT * FROM periode_bulan WHERE id_periode_bulan = '$id_periode_bulan'");
     $row = mysqli_fetch_assoc($query);
 }
 
@@ -81,17 +81,17 @@ if ($id_pengguna) {
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
-                <span class="text-muted fw-light">Beranda /</span> Periode
+                <span class="text-muted fw-light">Beranda /</span> Periode Bulan
               </h4>
 
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Data Periode</h5>
+                    <h5 class="mb-0">Data Periode Bulan</h5>
                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahPeriode">Tambah Periode</button>
                 </div>
 
                 <!-- Modal Tambah Periode -->
-                <form action="prosesTambahPeriode.php" method="post">
+                <form action="prosesTambahPeriodeBulan.php" method="post">
                 <div class="modal fade" id="modalTambahPeriode" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -128,20 +128,7 @@ if ($id_pengguna) {
                                     </select>
                                   </div>
                                 </div>
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="tahun" class="form-label">Tahun</label>
-                                    <select
-                                      name="tahun"
-                                      class="form-select"
-                                      aria-label="Default select example">
-                                      <option selected>- Pilih Tahun -</option>
-                                      <?php for ($i = date('Y'); $i >= 2022; $i--) : ?>
-                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                      <?php endfor; ?>
-                                    </select>
-                                  </div>
-                                </div>
+                                
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -154,7 +141,7 @@ if ($id_pengguna) {
                         </div>
                         </form>
 
-                        <form action="prosesUbahPeriode.php" method="post">
+                        <form action="prosesUbahPeriodeBulan.php" method="post">
                         <div class="modal fade" id="modalUbahPeriode" tabindex="-1" aria-hidden="true">
                           <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
@@ -173,10 +160,10 @@ if ($id_pengguna) {
                                     <label for="id" class="form-label">ID</label>
                                     <input
                                       type="text"
-                                      name="id_periode"
+                                      name="id_periode_bulan"
                                       class="form-control"
                                       placeholder="Masukkan Nama"
-                                      value="<?php echo isset($row) ? htmlspecialchars($row['id_periode']) : ''; ?>"
+                                      value="<?php echo isset($row) ? htmlspecialchars($row['id_periode_bulan']) : ''; ?>"
                                       readonly
                                     />
                                   </div>
@@ -201,20 +188,7 @@ if ($id_pengguna) {
                                     </select>
                                   </div>
                                 </div>
-                                <div class="row">
-                                  <div class="col mb-3">
-                                    <label for="tahun" class="form-label">Tahun</label>
-                                    <select
-                                      name="tahun"
-                                      class="form-select"
-                                      aria-label="Default select example">
-                                      <option selected>- Pilih Tahun -</option>
-                                      <?php for ($i = date('Y'); $i >= 2019; $i--) : ?>
-                                        <option value="<?php echo $i; ?>" <?php echo (isset($row) && $row['tahun'] == $i) ? 'selected' : ''; ?>><?php echo $i; ?></option>
-                                      <?php endfor; ?>
-                                    </select>
-                                  </div>
-                                </div>
+                                
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -234,19 +208,17 @@ if ($id_pengguna) {
                       <tr>
                         <th>No</th>
                         <th>Bulan</th>
-                        <th>Tahun</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">
                       <?php $i = 1; ?>
-                      <?php foreach ($periode as $row) { ?>
+                      <?php foreach ($periode_bulan as $row) { ?>
                     <tr>
                             <td>
                                 <strong><?php echo htmlspecialchars($i++); ?></strong>
                             </td>
                             <td><?php echo htmlspecialchars($row['bulan']);?></td>
-                            <td><?php echo htmlspecialchars($row['tahun']);?></td>
                             <td>
                                 <div class="dropdown">
                                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -254,12 +226,11 @@ if ($id_pengguna) {
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUbahPeriode"
-                                           data-id="<?php echo htmlspecialchars($row['id_periode']); ?>" 
-                                           data-bulan="<?php echo htmlspecialchars($row['bulan']); ?>" 
-                                           data-tahun="<?php echo htmlspecialchars($row['tahun']); ?>">
+                                           data-id="<?php echo htmlspecialchars($row['id_periode_bulan']); ?>" 
+                                           data-bulan="<?php echo htmlspecialchars($row['bulan']); ?>">
                                            <i class="bx bx-edit-alt me-1"></i> Edit
                                         </a>
-                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_periode']; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
+                                        <a class="dropdown-item" href="#" onclick="konfirmasiHapus(<?php echo $row['id_periode_bulan']; ?>)"><i class="bx bx-trash me-1"></i> Delete</a>
                                     </div>
                                 </div>
                             </td>
@@ -316,18 +287,15 @@ if ($id_pengguna) {
             var button = $(event.relatedTarget); // Tombol yang memicu modal
             var id = button.data('id'); // Ambil data-id
             var bulan = button.data('bulan'); // Ambil data-bulan
-            var tahun = button.data('tahun'); // Ambil data-tahun
 
             // Debugging: Cek nilai yang diambil
             console.log("ID: " + id);
             console.log("Bulan: " + bulan);
-            console.log("Tahun: " + tahun);
 
             // Isi input dengan data yang diambil
             var modal = $(this);
             modal.find('select[name="bulan"]').val(bulan);
-            modal.find('select[name="tahun"]').val(tahun); // Setel nilai dropdown tahun
-            modal.find('input[name="id_periode"]').val(id); // Tambahkan input untuk ID periode
+            modal.find('input[name="id_periode_bulan"]').val(id); // Tambahkan input untuk ID periode
         });
     </script>
 
@@ -335,7 +303,7 @@ if ($id_pengguna) {
     <script>
         function konfirmasiHapus(id) {
             if (confirm('Yakin Ingin Menghapus Data?')) {
-                window.location.href = 'prosesHapusPeriode.php?id_periode=' + id;
+                window.location.href = 'prosesHapusPeriodeBulan.php?id_periode_bulan=' + id;
             }
         }
     </script>

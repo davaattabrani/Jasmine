@@ -12,32 +12,30 @@ if (isset($_POST['submit'])) {
     var_dump($_POST);
 
     // Ambil data dari form
-    $id_periode = $_POST['id_periode'];
+    $id_periode_bulan = $_POST['id_periode_bulan'];
     $bulan = $_POST['bulan'];
-    $tahun = $_POST['tahun'];
 
     // Sanitasi input
-    $id_periode = mysqli_real_escape_string($conn, $id_periode);
+    $id_periode_bulan = mysqli_real_escape_string($conn, $id_periode_bulan);
     $bulan = mysqli_real_escape_string($conn, $bulan);
-    $tahun = mysqli_real_escape_string($conn, $tahun);
 
     // Cek apakah ID pengguna ada di database
-    $result = mysqli_query($conn, "SELECT * FROM periode WHERE id_periode='$id_periode'");
+    $result = mysqli_query($conn, "SELECT * FROM periode_bulan WHERE id_periode_bulan='$id_periode_bulan'");
     if (mysqli_num_rows($result) == 0) {
         die("ID periode tidak ditemukan.");
     }
 
     // Tambahkan kondisi pengecekan jika ada data dengan bulan dan tahun yang sama
-    $checkQuery = "SELECT * FROM periode WHERE bulan='$bulan' AND tahun='$tahun' AND id_periode != '$id_periode'";
+    $checkQuery = "SELECT * FROM periode_bulan WHERE bulan='$bulan' AND id_periode_bulan != '$id_periode_bulan'";
     $checkResult = mysqli_query($conn, $checkQuery);
     if (mysqli_num_rows($checkResult) > 0) {
-        echo "<script>alert('Data dengan bulan dan tahun yang sama sudah ada!');</script>";
-        echo "<script>window.location.href = 'periode.php';</script>";
+        echo "<script>alert('Data dengan bulan yang sama sudah ada!');</script>";
+        echo "<script>window.location.href = 'periodeBulan.php';</script>";
         exit();
     }
 
     // Hapus kondisi pengecekan bulan dan tahun jika kosong
-    $query = "UPDATE periode SET bulan='$bulan', tahun='$tahun' WHERE id_periode='$id_periode'";
+    $query = "UPDATE periode_bulan SET bulan='$bulan' WHERE id_periode_bulan='$id_periode_bulan'";
 
     // Debugging: Tampilkan query yang akan dijalankan
     echo "Query: " . $query . "<br>";
