@@ -158,24 +158,7 @@ $resObatKeluar = mysqli_query($conn, $dataobatkeluar);
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Obat Keluar</h5>
-                    <div class="col-sm-2">
-                      <select class="form-control" id="tahun" name="tahun">
-                          <?php
-                          for ($i = date('Y'); $i >= 2022; $i--) {
-                              echo "<option value='$i'>$i</option>";
-                          }
-                          ?>
-                      </select>
-                    </div>
-                    <div class="col-sm-2">
-                      <select class="form-control" id="tahun" name="tahun">
-                          <?php
-                          for ($i = date('Y'); $i >= 2022; $i--) {
-                              echo "<option value='$i'>$i</option>";
-                          }
-                          ?>
-                      </select>
-                    </div>
+                    
                     <form class="d-flex">
                       <div class="input-group">
                         <span class="input-group-text"><i class="tf-icons bx bx-search"></i></span>

@@ -116,12 +116,10 @@ $resstok = mysqli_query($conn, $datastok);
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
-
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold py-3 mb-4">
                 <span class="text-muted fw-light">Beranda /</span> Stok
               </h4>
-
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Data Stok</h5>
@@ -132,8 +130,6 @@ $resstok = mysqli_query($conn, $datastok);
                           </div>
                         </form>
                 </div>
-
-
                  <!-- Tabel -->                           
                 <div class="table-responsive text-nowrap">
                   <table class="table table-striped" id="dataTable">
